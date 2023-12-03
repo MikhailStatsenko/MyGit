@@ -10,6 +10,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,6 +19,15 @@ import java.util.Set;
 
 @Service
 public class CommandServiceImpl implements CommandService, GitRepositoryOpener {
+    private void createInitialCommit(RepositoryContext repoContext) throws IOException, GitAPIException {
+        Path repositoryPath = repoContext.getRepositoryPath();
+        try (Git git = openGitRepository(repositoryPath)) {
+            git.commit()
+                    .setMessage("Repository " + repoContext.repositoryName() + " created")
+                    .setAllowEmpty(true)
+                    .call();
+        }
+    }
     public void init(RepositoryContext repoContext) throws GitAPIException, IOException {
         Path repositoryPath = repoContext.getRepositoryPath();
         if (Files.isDirectory(repositoryPath)) {
@@ -26,7 +36,9 @@ public class CommandServiceImpl implements CommandService, GitRepositoryOpener {
         try (Git ignored = Git.init()
                 .setDirectory(Files.createDirectories(repositoryPath).toFile())
                 .call()
-        ) {}
+        ) {
+            createInitialCommit(repoContext);
+        }
     }
 
     // TODO: doesn't work on deleted files

@@ -81,4 +81,19 @@ public class BranchController {
         );
         return ResponseEntity.ok(new RenameBranchResponse(newBranchName));
     }
+
+    @PostMapping("/merge_branches/{userId}/{repositoryName}")
+    public ResponseEntity<String> mergeBranches(
+            @PathVariable String userId,
+            @PathVariable String repositoryName,
+            @RequestParam String branchToMerge,
+            @RequestParam String branchToMergeInto
+    ) throws GitAPIException, IOException {
+        branchService.mergeBranches(
+                new RepositoryContext(userId, repositoryName),
+                branchToMerge,
+                branchToMergeInto
+        );
+        return ResponseEntity.ok("Branches merged successfully");
+    }
 }

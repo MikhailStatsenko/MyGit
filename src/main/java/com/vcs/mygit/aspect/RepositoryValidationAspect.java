@@ -11,7 +11,7 @@ import java.nio.file.Files;
 @Aspect
 @Component
 public class RepositoryValidationAspect {
-    @Before(value = "execution(* com.vcs.mygit.git.service.*.*(..)) && args(repositoryContext,..)",
+    @Before(value = "execution(* com.vcs.mygit.git.service.impl.*.*(..)) && args(repositoryContext,..)",
             argNames = "repositoryContext")
     public void validateRepositoryPath(RepositoryContext repositoryContext) {
         String userId = repositoryContext.userId();
@@ -24,8 +24,8 @@ public class RepositoryValidationAspect {
         }
     }
 
-    @Before(value = "execution(* com.vcs.mygit.git.service.*.*(..)) && args(repositoryContext,..) " +
-            "&& !execution(* *.service.*.init(..))",
+    @Before(value = "execution(* com.vcs.mygit.git.service.impl.*.*(..)) && args(repositoryContext,..) " +
+            "&& !execution(* com.vcs.mygit.git.service.impl.*.init(..))",
             argNames = "repositoryContext")
     public void checkIfRepositoryExits(RepositoryContext repositoryContext) {
         var path = repositoryContext.getRepositoryPath();

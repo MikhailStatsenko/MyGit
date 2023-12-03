@@ -17,8 +17,19 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class BranchValidationAspect {
     private final BranchService branchService;
-    @Before(value = "execution(* com.vcs.mygit.git.service.*.*(..)) && args(repositoryContext, branchName, ..) " +
-            "&& !execution(* *.service.*.createBranch(..))",
+
+    @Before(value = "execution(* com.vcs.mygit.git.service.impl.*.*(..)) && args(branchName, ..)", argNames = "branchName")
+    public void validateBranchName(String branchName) {
+        String branchPattern = "^[\\w.-]+$";
+        if (!Pattern.matches(branchPattern, branchName)) {
+            throw new IllegalArgumentException("Invalid branch name. Branch names can only contain " +
+                            "letters, numbers, underscore (_) or dash (-)");
+        }
+    }
+
+    @Before(value = "within(com.vcs.mygit.git.service.BranchService+) && " +
+            "execution(* com.vcs.mygit.git.service.impl.*.*(..)) && args(repositoryContext, branchName, ..) " +
+            "&& !execution(* com.vcs.mygit.git.service.impl.*.createBranch(..))",
             argNames = "repositoryContext, branchName")
     public void checkIfBranchExists(
             RepositoryContext repositoryContext,
@@ -28,14 +39,5 @@ public class BranchValidationAspect {
         boolean branchExists = branches.contains(branchName);
         if (!branchExists)
             throw new IllegalArgumentException("Branch " + branchName + " not found");
-    }
-
-    @Before(value = "execution(* com.vcs.mygit.git.service.*.*(..)) && args(branchName, ..) ", argNames = "branchName")
-    public void validateBranchName(String branchName) {
-        String branchPattern = "^[\\w.-]+$";
-        if (!Pattern.matches(branchPattern, branchName)) {
-            throw new IllegalArgumentException("Invalid branch name. Branch names can only contain " +
-                            "letters, numbers, underscore (_) or dash (-)");
-        }
     }
 }
