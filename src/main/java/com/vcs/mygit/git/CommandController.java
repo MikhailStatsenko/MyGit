@@ -3,18 +3,17 @@ package com.vcs.mygit.git;
 import com.vcs.mygit.git.dto.RepositoryContext;
 import com.vcs.mygit.git.dto.response.CommitResponse;
 import com.vcs.mygit.git.service.impl.CommandServiceImpl;
+import com.vcs.mygit.git.util.DateFormatter;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.URI;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 import java.util.Set;
 
 
@@ -23,20 +22,18 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class CommandController {
     private final CommandServiceImpl gitService;
-    private final SimpleDateFormat dateFormatter = new SimpleDateFormat("MMM dd yyyy", Locale.ENGLISH);
 
-    //TODO: location must lead to getFiles controller method
     @PostMapping("/init/{userId}/{repositoryName}")
     public ResponseEntity<String> initializeRepository(
             @PathVariable String userId,
-            @PathVariable String repositoryName
+            @PathVariable String repositoryName,
+            HttpServletRequest request
     ) throws GitAPIException, IOException {
-        gitService.init(
-                new RepositoryContext(userId, repositoryName)
-        );
-        URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
-        return ResponseEntity.created(location)
-                .body(location.toString());
+        var repositoryContext = new RepositoryContext(userId, repositoryName);
+        gitService.init(repositoryContext);
+        String basePath = request.getRequestURL().toString().replace("/git/init", "/files");
+        URI location = URI.create(basePath);
+        return ResponseEntity.created(location).build();
     }
 
     @PostMapping("/commit/{userId}/{repositoryName}")
@@ -45,14 +42,12 @@ public class CommandController {
             @PathVariable String repositoryName,
             @RequestParam(required = false, defaultValue = "New commit") String message
     ) throws GitAPIException, IOException {
-        RevCommit commitInfo = gitService.commit(
-                new RepositoryContext(userId, repositoryName),
-                message
-        );
+        var repositoryContext = new RepositoryContext(userId, repositoryName);
+        RevCommit commitInfo = gitService.commit(repositoryContext, message);
         Date commitDate = commitInfo.getAuthorIdent().getWhen();
         return ResponseEntity.ok(new CommitResponse(
                 commitInfo.getId().getName(),
-                dateFormatter.format(commitDate),
+                DateFormatter.format(commitDate),
                 commitInfo.getFullMessage()
         ));
     }
@@ -63,10 +58,8 @@ public class CommandController {
             @PathVariable String repositoryName,
             @RequestParam(required = false) String pattern
     ) throws GitAPIException, IOException {
-        Set<String> addedFiles = gitService.add(
-                new RepositoryContext(userId, repositoryName),
-                pattern
-        );
+        var repositoryContext = new RepositoryContext(userId, repositoryName);
+        Set<String> addedFiles = gitService.add(repositoryContext, pattern);
         return ResponseEntity.ok(addedFiles);
     }
 
@@ -75,7 +68,8 @@ public class CommandController {
             @PathVariable String userId,
             @PathVariable String repositoryName
     ) throws GitAPIException, IOException {
-        Set<String> addedFiles = gitService.addAll(new RepositoryContext(userId, repositoryName));
+        var repositoryContext = new RepositoryContext(userId, repositoryName);
+        Set<String> addedFiles = gitService.addAll(repositoryContext);
         return ResponseEntity.ok(addedFiles);
     }
 }

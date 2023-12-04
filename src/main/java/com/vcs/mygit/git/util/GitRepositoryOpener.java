@@ -1,4 +1,4 @@
-package com.vcs.mygit.git.service;
+package com.vcs.mygit.git.util;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Repository;

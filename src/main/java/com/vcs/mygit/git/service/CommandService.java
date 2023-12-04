@@ -1,6 +1,5 @@
 package com.vcs.mygit.git.service;
 
-import com.vcs.mygit.aspect.RepositoryValidationAspect;
 import com.vcs.mygit.exception.NothingToCommitException;
 import com.vcs.mygit.git.dto.RepositoryContext;
 import org.eclipse.jgit.api.errors.GitAPIException;

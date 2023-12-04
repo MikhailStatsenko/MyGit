@@ -20,13 +20,18 @@ public class GitControllerExceptionHandler {
         return ResponseEntity.badRequest().body("Error: " + e.getMessage());
     }
 
+    @ExceptionHandler(MergeConflictException.class)
+    public ResponseEntity<MergeConflictResponse> handleMergeConflictException(MergeConflictException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new MergeConflictResponse(e.getConflictingFiles()));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleGeneralException(Exception e) {
         return ResponseEntity.internalServerError().body("Internal Server Error: " + e.getMessage());
     }
 
-    @ExceptionHandler(MergeConflictException.class)
-    public ResponseEntity<MergeConflictResponse> handleMergeConflictException(MergeConflictException e) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(new MergeConflictResponse(e.getConflictingFiles()));
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> handleGeneralRuntimeException(Exception e) {
+        return ResponseEntity.internalServerError().body("Runtime exception: " + e.getMessage());
     }
 }

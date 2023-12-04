@@ -3,14 +3,13 @@ package com.vcs.mygit.git.service.impl;
 import com.vcs.mygit.exception.NothingToCommitException;
 import com.vcs.mygit.git.dto.RepositoryContext;
 import com.vcs.mygit.git.service.CommandService;
-import com.vcs.mygit.git.service.GitRepositoryOpener;
+import com.vcs.mygit.git.util.GitRepositoryOpener;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -41,7 +40,6 @@ public class CommandServiceImpl implements CommandService, GitRepositoryOpener {
         }
     }
 
-    // TODO: doesn't work on deleted files
     public RevCommit commit(
             RepositoryContext repoContext,
             String message
@@ -50,7 +48,7 @@ public class CommandServiceImpl implements CommandService, GitRepositoryOpener {
 
         try (Git git = openGitRepository(repositoryPath)) {
             Status status = git.status().call();
-            if (status.getAdded().isEmpty() && status.getChanged().isEmpty()) {
+            if (status.getAdded().isEmpty() && status.getChanged().isEmpty() && status.getRemoved().isEmpty()) {
                 throw new NothingToCommitException("Nothing to commit, working directory clean");
             }
             return git.commit().setMessage(message).call();
