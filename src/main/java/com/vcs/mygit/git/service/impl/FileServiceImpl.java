@@ -2,10 +2,8 @@ package com.vcs.mygit.git.service.impl;
 
 import com.vcs.mygit.git.dto.RepositoryContext;
 import com.vcs.mygit.git.dto.response.UploadFilesResponse;
-import com.vcs.mygit.git.service.CommandService;
 import com.vcs.mygit.git.service.FileService;
 import lombok.RequiredArgsConstructor;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,9 +21,8 @@ import java.util.zip.ZipOutputStream;
 
 @Service
 @RequiredArgsConstructor
-public class FileServiceImpl  implements FileService {
-    private final CommandService commandService;
-
+public class FileServiceImpl implements FileService {
+    @Override
     public Object getFileOrDirectoryContents(RepositoryContext repoContext, String path) throws IOException {
         Path targetPath = repoContext.getRepositoryPath();
         if (path != null && !path.isBlank()) {
@@ -41,6 +38,7 @@ public class FileServiceImpl  implements FileService {
         }
     }
 
+    @Override
     public String getFileContent(Path filePath) throws IOException {
         if (!Files.isRegularFile(filePath)) {
             throw new IllegalArgumentException("The path does not point to a file");
@@ -48,6 +46,7 @@ public class FileServiceImpl  implements FileService {
         return Files.readString(filePath);
     }
 
+    @Override
     public Map<String, String> getDirectoryContents(Path dirPath) throws IOException {
         if (!Files.exists(dirPath) || !Files.isDirectory(dirPath)) {
             throw new IllegalArgumentException("Invalid directory path");
@@ -82,18 +81,15 @@ public class FileServiceImpl  implements FileService {
         return existingFiles;
     }
 
+    @Override
     public UploadFilesResponse uploadFiles(
             RepositoryContext repoContext,
             MultipartFile[] files
-    ) throws IOException, GitAPIException {
+    ) throws IOException {
         if (files == null || files.length == 0)
             throw new IllegalArgumentException("There are no files to upload");
 
         Path repositoryPath = repoContext.getRepositoryPath();
-
-        if (!Files.exists(repositoryPath)) {
-            commandService.init(repoContext);
-        }
 
         Set<String> existingFiles = getExistingFiles(repositoryPath);
 
@@ -118,6 +114,7 @@ public class FileServiceImpl  implements FileService {
         return new UploadFilesResponse(rejectedFiles, addedFiles);
     }
 
+    @Override
     public void getRepositoryArchive(
             RepositoryContext repoContext,
             HttpServletResponse response
@@ -141,5 +138,48 @@ public class FileServiceImpl  implements FileService {
                 }
             });
         }
+    }
+
+    @Override
+    public List<String> deleteFile(RepositoryContext repoContext, String path) throws IOException {
+        Path pathInRepository = repoContext.getRepositoryPath().resolve(path);
+
+        if (!isPathAllowedToDelete(pathInRepository)) {
+            throw new IllegalArgumentException("Operation not permitted");
+        }
+
+        if (!Files.exists(pathInRepository)) {
+            throw new IllegalArgumentException("No such file or directory");
+        }
+
+        if (Files.isDirectory(pathInRepository)) {
+            return deleteDirectory(pathInRepository);
+        } else {
+            Files.delete(pathInRepository);
+            return Collections.singletonList(pathInRepository.toString());
+        }
+    }
+
+    private boolean isPathAllowedToDelete(Path path) {
+        List<String> pathSegments = Arrays.stream(path.toString().split("/")).toList();
+        return pathSegments.size() > 2;
+    }
+
+    private List<String> deleteDirectory(Path directoryPath) throws IOException {
+        List<String> deletedFiles = new ArrayList<>();
+        Files.walkFileTree(directoryPath, new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Files.delete(file);
+                deletedFiles.add(file.toString());
+                return FileVisitResult.CONTINUE;
+            }
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                Files.delete(dir);
+                return FileVisitResult.CONTINUE;
+            }
+        });
+        return deletedFiles;
     }
 }

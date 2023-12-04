@@ -9,6 +9,7 @@ import com.vcs.mygit.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,8 +22,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final AuthenticationManager authenticationManager;
     @Override
     public JwtAuthenticationResponse register(RegistrationRequest request) {
+        if (userRepository.findUserByUsername(request.username()).isPresent()) {
+            throw new IllegalArgumentException("User already exists");
+        }
+
         var user = User.builder()
-                .name(request.name())
+                .username(request.username())
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
                 .role(Role.USER)
@@ -35,10 +40,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public JwtAuthenticationResponse login(LoginRequest request) {
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.email(), request.password()));
+                new UsernamePasswordAuthenticationToken(request.username(), request.password()));
 
-        var user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid email or password."));
+        var user = userRepository.findUserByUsername(request.username())
+                .orElseThrow(() -> new UsernameNotFoundException("Invalid email or password"));
 
         var jwt = jwtService.generateToken(user);
         return new JwtAuthenticationResponse(jwt);

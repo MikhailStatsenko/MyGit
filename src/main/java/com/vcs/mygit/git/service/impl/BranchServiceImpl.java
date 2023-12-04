@@ -35,6 +35,7 @@ public class BranchServiceImpl implements BranchService, GitRepositoryOpener {
         }
     }
 
+    @Override
     public String getCurrentBranch(RepositoryContext repoContext) throws IOException {
         Path repositoryPath = repoContext.getRepositoryPath();
 
@@ -43,6 +44,8 @@ public class BranchServiceImpl implements BranchService, GitRepositoryOpener {
             return repository.getBranch();
         }
     }
+
+    @Override
     public String createBranch(
             RepositoryContext repoContext,
             String branchName
@@ -58,6 +61,7 @@ public class BranchServiceImpl implements BranchService, GitRepositoryOpener {
         }
     }
 
+    @Override
     public void switchBranch(
             RepositoryContext repoContext,
             String branchName
@@ -68,6 +72,7 @@ public class BranchServiceImpl implements BranchService, GitRepositoryOpener {
         }
     }
 
+    @Override
     public List<String> listBranches(RepositoryContext repoContext) throws IOException, GitAPIException {
         Path repositoryPath = repoContext.getRepositoryPath();
 
@@ -79,6 +84,7 @@ public class BranchServiceImpl implements BranchService, GitRepositoryOpener {
         }
     }
 
+    @Override
     public String deleteBranch(
             RepositoryContext repoContext,
             String branchName
@@ -96,6 +102,7 @@ public class BranchServiceImpl implements BranchService, GitRepositoryOpener {
         }
     }
 
+    @Override
     public String renameBranch(
             RepositoryContext repoContext,
             String branchName,
@@ -113,6 +120,7 @@ public class BranchServiceImpl implements BranchService, GitRepositoryOpener {
         }
     }
 
+    @Override
     public RevCommit mergeBranches(
             RepositoryContext repoContext,
             String branchToMerge,

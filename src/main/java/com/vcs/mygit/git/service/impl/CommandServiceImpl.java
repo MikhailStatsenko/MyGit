@@ -27,6 +27,8 @@ public class CommandServiceImpl implements CommandService, GitRepositoryOpener {
                     .call();
         }
     }
+
+    @Override
     public void init(RepositoryContext repoContext) throws GitAPIException, IOException {
         Path repositoryPath = repoContext.getRepositoryPath();
         if (Files.isDirectory(repositoryPath)) {
@@ -40,6 +42,7 @@ public class CommandServiceImpl implements CommandService, GitRepositoryOpener {
         }
     }
 
+    @Override
     public RevCommit commit(
             RepositoryContext repoContext,
             String message
@@ -55,6 +58,7 @@ public class CommandServiceImpl implements CommandService, GitRepositoryOpener {
         }
     }
 
+    @Override
     public Set<String> add(
             RepositoryContext repoContext,
             String filePath
@@ -75,6 +79,7 @@ public class CommandServiceImpl implements CommandService, GitRepositoryOpener {
         }
     }
 
+    @Override
     public Set<String> addAll(RepositoryContext repoContext) throws IOException, GitAPIException {
         return add(repoContext, ".");
     }

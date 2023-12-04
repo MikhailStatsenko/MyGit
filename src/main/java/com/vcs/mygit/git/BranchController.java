@@ -1,5 +1,6 @@
 package com.vcs.mygit.git;
 
+import com.vcs.mygit.annotation.RepositoryOwnerAccess;
 import com.vcs.mygit.git.dto.RepositoryContext;
 import com.vcs.mygit.git.dto.response.*;
 import com.vcs.mygit.git.service.BranchService;
@@ -19,6 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BranchController {
     private final BranchService branchService;
+    @RepositoryOwnerAccess
     @PostMapping("/create/{userId}/{repositoryName}")
     public ResponseEntity<CreateBranchResponse> createBranch(
             @PathVariable String userId,
@@ -31,6 +33,7 @@ public class BranchController {
         return ResponseEntity.ok(new CreateBranchResponse(newBranch, currentBranch));
     }
 
+    @RepositoryOwnerAccess
     @PostMapping("/switch/{userId}/{repositoryName}")
     public ResponseEntity<SwitchBranchResponse> switchBranch(
             @PathVariable String userId,
@@ -43,6 +46,7 @@ public class BranchController {
         return ResponseEntity.ok(new SwitchBranchResponse(currentBranch));
     }
 
+    @RepositoryOwnerAccess
     @GetMapping("/list/{userId}/{repositoryName}")
     public ResponseEntity<ListBranchesResponse> listBranches(
             @PathVariable String userId,
@@ -54,6 +58,7 @@ public class BranchController {
         return ResponseEntity.ok(new ListBranchesResponse(currentBranch, branches));
     }
 
+    @RepositoryOwnerAccess
     @DeleteMapping("/delete/{userId}/{repositoryName}")
     public ResponseEntity<DeleteBranchResponse> deleteBranch(
             @PathVariable String userId,
@@ -65,6 +70,7 @@ public class BranchController {
         return ResponseEntity.ok(new DeleteBranchResponse(deletedBranch));
     }
 
+    @RepositoryOwnerAccess
     @PutMapping("/rename/{userId}/{repositoryName}")
     public ResponseEntity<RenameBranchResponse> renameBranch(
             @PathVariable String userId,
@@ -77,6 +83,7 @@ public class BranchController {
         return ResponseEntity.ok(new RenameBranchResponse(newBranchName));
     }
 
+    @RepositoryOwnerAccess
     @PostMapping("/merge/{userId}/{repositoryName}")
     public ResponseEntity<CommitResponse> mergeBranches(
             @PathVariable String userId,

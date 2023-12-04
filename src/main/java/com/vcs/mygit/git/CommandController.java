@@ -1,5 +1,6 @@
 package com.vcs.mygit.git;
 
+import com.vcs.mygit.annotation.RepositoryOwnerAccess;
 import com.vcs.mygit.git.dto.RepositoryContext;
 import com.vcs.mygit.git.dto.response.CommitResponse;
 import com.vcs.mygit.git.service.impl.CommandServiceImpl;
@@ -23,6 +24,7 @@ import java.util.Set;
 public class CommandController {
     private final CommandServiceImpl gitService;
 
+    @RepositoryOwnerAccess
     @PostMapping("/init/{userId}/{repositoryName}")
     public ResponseEntity<String> initializeRepository(
             @PathVariable String userId,
@@ -36,6 +38,7 @@ public class CommandController {
         return ResponseEntity.created(location).build();
     }
 
+    @RepositoryOwnerAccess
     @PostMapping("/commit/{userId}/{repositoryName}")
     public ResponseEntity<CommitResponse> commitChanges(
             @PathVariable String userId,
@@ -52,6 +55,7 @@ public class CommandController {
         ));
     }
 
+    @RepositoryOwnerAccess
     @PostMapping("/add/{userId}/{repositoryName}")
     public ResponseEntity<Set<String>> addFileToRepository(
             @PathVariable String userId,
@@ -63,6 +67,7 @@ public class CommandController {
         return ResponseEntity.ok(addedFiles);
     }
 
+    @RepositoryOwnerAccess
     @PostMapping("/addAll/{userId}/{repositoryName}")
     public ResponseEntity<Set<String>> addAllFilesToRepository(
             @PathVariable String userId,

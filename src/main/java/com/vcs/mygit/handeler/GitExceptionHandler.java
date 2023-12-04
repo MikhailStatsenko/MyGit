@@ -6,11 +6,12 @@ import com.vcs.mygit.exception.RepositoryNotFoundException;
 import com.vcs.mygit.git.dto.response.MergeConflictResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice(basePackages = "com.vcs.mygit.git")
-public class GitControllerExceptionHandler {
+public class GitExceptionHandler {
     @ExceptionHandler({
             RepositoryNotFoundException.class,
             NothingToCommitException.class,
@@ -18,6 +19,11 @@ public class GitControllerExceptionHandler {
     })
     public ResponseEntity<String> handleRepositoryExceptions(RuntimeException e) {
         return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<String> handleMergeConflictException(AccessDeniedException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Error: " + e.getMessage());
     }
 
     @ExceptionHandler(MergeConflictException.class)

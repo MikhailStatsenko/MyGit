@@ -1,11 +1,12 @@
 package com.vcs.mygit.git;
 
+import com.vcs.mygit.annotation.RepositoryOwnerAccess;
 import com.vcs.mygit.git.dto.RepositoryContext;
+import com.vcs.mygit.git.dto.response.DeleteFileResponse;
 import com.vcs.mygit.git.dto.response.UploadFilesResponse;
 import com.vcs.mygit.git.service.FileService;
 import com.vcs.mygit.git.util.PathExtractor;
 import lombok.RequiredArgsConstructor;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/files")
@@ -30,12 +32,13 @@ public class FileController {
         return ResponseEntity.ok(fileService.getFileOrDirectoryContents(repositoryContext, path));
     }
 
+    @RepositoryOwnerAccess
     @PostMapping("/upload/{userId}/{repositoryName}")
     public ResponseEntity<UploadFilesResponse> uploadFilesToWorkingDirectory(
             @PathVariable String userId,
             @PathVariable String repositoryName,
             @RequestParam(value = "files", required = false) MultipartFile[] files
-    ) throws GitAPIException, IOException {
+    ) throws IOException {
         var repositoryContext = new RepositoryContext(userId, repositoryName);
         UploadFilesResponse response = fileService.uploadFiles(repositoryContext, files);
         return ResponseEntity.ok(response);
@@ -50,5 +53,18 @@ public class FileController {
         var repositoryContext = new RepositoryContext(userId, repositoryName);
         fileService.getRepositoryArchive(repositoryContext, response);
         response.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    @RepositoryOwnerAccess
+    @DeleteMapping("/delete/{userId}/{repositoryName}/**")
+    public ResponseEntity<DeleteFileResponse> deleteFile(
+            @PathVariable String userId,
+            @PathVariable String repositoryName,
+            HttpServletRequest request
+    ) throws IOException {
+        String path = PathExtractor.extractPathFromRequest(request);
+        var repositoryContext = new RepositoryContext(userId, repositoryName);
+        List<String> deletedFiles = fileService.deleteFile(repositoryContext, path);
+        return ResponseEntity.ok(new DeleteFileResponse(deletedFiles));
     }
 }
