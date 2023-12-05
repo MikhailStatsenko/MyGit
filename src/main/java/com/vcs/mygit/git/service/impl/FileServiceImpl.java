@@ -48,6 +48,9 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public Map<String, String> getDirectoryContents(Path dirPath) throws IOException {
+        if (!dirPath.startsWith(RepositoryContext.rootPath())) {
+            dirPath = Path.of(RepositoryContext.rootPath()).resolve(dirPath);
+        }
         if (!Files.exists(dirPath) || !Files.isDirectory(dirPath)) {
             throw new IllegalArgumentException("Invalid directory path");
         }
@@ -69,12 +72,21 @@ public class FileServiceImpl implements FileService {
         return directoryContents;
     }
 
-    private Set<String> getExistingFiles(Path directoryPath) throws IOException {
+    @Override
+    public Map<String, String> getDirectoryContents(String repoPath) throws IOException {
+        if (repoPath == null || repoPath.isBlank()) {
+            throw new IllegalArgumentException("Repository path can't be empty or null");
+        }
+        var path = Path.of(repoPath);
+        return getDirectoryContents(path);
+    }
+
+    private Set<String> getExistingFiles(Path dirPath) throws IOException {
         Set<String> existingFiles = new HashSet<>();
-        try (var stream =  Files.walk(directoryPath)) {
+        try (var stream =  Files.walk(dirPath)) {
             stream.filter(Files::isRegularFile)
                     .forEach(file -> {
-                        Path relativePath = directoryPath.relativize(file);
+                        Path relativePath = dirPath.relativize(file);
                         existingFiles.add(relativePath.toString());
                     });
         }
@@ -162,10 +174,11 @@ public class FileServiceImpl implements FileService {
 
     private boolean isPathAllowedToDelete(Path path) {
         List<String> pathSegments = Arrays.stream(path.toString().split("/")).toList();
-        return pathSegments.size() > 2;
+        return pathSegments.size() > RepositoryContext.rootPath().split("/").length + 2;
     }
 
     private List<String> deleteDirectory(Path directoryPath) throws IOException {
+
         List<String> deletedFiles = new ArrayList<>();
         Files.walkFileTree(directoryPath, new SimpleFileVisitor<>() {
             @Override

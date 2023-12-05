@@ -11,12 +11,13 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping("/git/branch")
+@RequestMapping("api/git/branch")
 @RequiredArgsConstructor
 public class BranchController {
     private final BranchService branchService;
@@ -25,7 +26,8 @@ public class BranchController {
     public ResponseEntity<CreateBranchResponse> createBranch(
             @PathVariable String userId,
             @PathVariable String repositoryName,
-            @RequestParam String branch
+            @RequestParam String branch,
+            HttpServletRequest httpServletRequest
     ) throws GitAPIException, IOException {
         var repositoryContext = new RepositoryContext(userId, repositoryName);
         String newBranch = branchService.createBranch(repositoryContext, branch);
@@ -38,7 +40,8 @@ public class BranchController {
     public ResponseEntity<SwitchBranchResponse> switchBranch(
             @PathVariable String userId,
             @PathVariable String repositoryName,
-            @RequestParam String branch
+            @RequestParam String branch,
+            HttpServletRequest httpServletRequest
     ) throws GitAPIException, IOException {
         var repositoryContext = new RepositoryContext(userId, repositoryName);
         branchService.switchBranch(repositoryContext, branch);
@@ -50,7 +53,8 @@ public class BranchController {
     @GetMapping("/list/{userId}/{repositoryName}")
     public ResponseEntity<ListBranchesResponse> listBranches(
             @PathVariable String userId,
-            @PathVariable String repositoryName
+            @PathVariable String repositoryName,
+            HttpServletRequest httpServletRequest
     ) throws GitAPIException, IOException {
         var repositoryContext = new RepositoryContext(userId, repositoryName);
         List<String> branches = branchService.listBranches(repositoryContext);
@@ -63,7 +67,8 @@ public class BranchController {
     public ResponseEntity<DeleteBranchResponse> deleteBranch(
             @PathVariable String userId,
             @PathVariable String repositoryName,
-            @RequestParam String branch
+            @RequestParam String branch,
+            HttpServletRequest httpServletRequest
     ) throws GitAPIException, IOException {
         var repositoryContext = new RepositoryContext(userId, repositoryName);
         String deletedBranch = branchService.deleteBranch(repositoryContext, branch);
@@ -76,7 +81,8 @@ public class BranchController {
             @PathVariable String userId,
             @PathVariable String repositoryName,
             @RequestParam String branch,
-            @RequestParam String newBranch
+            @RequestParam String newBranch,
+            HttpServletRequest httpServletRequest
     ) throws GitAPIException, IOException {
         var repositoryContext = new RepositoryContext(userId, repositoryName);
         String newBranchName = branchService.renameBranch(repositoryContext, branch, newBranch);
@@ -89,7 +95,8 @@ public class BranchController {
             @PathVariable String userId,
             @PathVariable String repositoryName,
             @RequestParam String branchToMerge,
-            @RequestParam String branchToMergeInto
+            @RequestParam String branchToMergeInto,
+            HttpServletRequest httpServletRequest
     ) throws GitAPIException, IOException {
         var repositoryContext = new RepositoryContext(userId, repositoryName);
         RevCommit mergeCommitInfo = branchService.mergeBranches(repositoryContext, branchToMerge, branchToMergeInto);

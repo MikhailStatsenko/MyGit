@@ -19,7 +19,7 @@ import java.util.Set;
 
 
 @RestController
-@RequestMapping("/git")
+@RequestMapping("api/git")
 @RequiredArgsConstructor
 public class CommandController {
     private final CommandServiceImpl gitService;
@@ -43,7 +43,8 @@ public class CommandController {
     public ResponseEntity<CommitResponse> commitChanges(
             @PathVariable String userId,
             @PathVariable String repositoryName,
-            @RequestParam(required = false, defaultValue = "New commit") String message
+            @RequestParam(required = false, defaultValue = "New commit") String message,
+            HttpServletRequest httpServletRequest
     ) throws GitAPIException, IOException {
         var repositoryContext = new RepositoryContext(userId, repositoryName);
         RevCommit commitInfo = gitService.commit(repositoryContext, message);
@@ -60,7 +61,8 @@ public class CommandController {
     public ResponseEntity<Set<String>> addFileToRepository(
             @PathVariable String userId,
             @PathVariable String repositoryName,
-            @RequestParam(required = false) String pattern
+            @RequestParam(required = false) String pattern,
+            HttpServletRequest httpServletRequest
     ) throws GitAPIException, IOException {
         var repositoryContext = new RepositoryContext(userId, repositoryName);
         Set<String> addedFiles = gitService.add(repositoryContext, pattern);
@@ -71,7 +73,8 @@ public class CommandController {
     @PostMapping("/addAll/{userId}/{repositoryName}")
     public ResponseEntity<Set<String>> addAllFilesToRepository(
             @PathVariable String userId,
-            @PathVariable String repositoryName
+            @PathVariable String repositoryName,
+            HttpServletRequest httpServletRequest
     ) throws GitAPIException, IOException {
         var repositoryContext = new RepositoryContext(userId, repositoryName);
         Set<String> addedFiles = gitService.addAll(repositoryContext);

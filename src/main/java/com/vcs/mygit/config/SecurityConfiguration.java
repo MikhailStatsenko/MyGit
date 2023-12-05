@@ -25,10 +25,9 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//                .authorizeHttpRequests(request -> request.anyRequest().permitAll())
         http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/api/auth/**").permitAll()
+                .antMatchers("/api/auth/**", "/static/**","/", "/api/user/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()
@@ -36,13 +35,6 @@ public class SecurityConfiguration {
                 .and()
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
-//        http.csrf(AbstractHttpConfigurer::disable)
-//                .authorizeHttpRequests(request -> request.requestMatchers("/api/auth/**")
-//                        .permitAll().anyRequest().authenticated())
-//                .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
-//                .authenticationProvider(authenticationProvider()).addFilterBefore(
-//                        jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

@@ -1,0 +1,124 @@
+/* Общие стили */
+body, html {
+    height: 100%;
+}
+
+a {
+    color: black;
+    transition: all 0.22s;
+}
+
+a:hover {
+    color: #777d81;
+}
+
+a:active {
+    color: #3e4244;
+}
+
+li {
+    font-size: 18px;
+}
+
+main {
+    height: calc(100vh - 70px);
+    overflow: hidden;
+}
+
+.hidden {
+    display: none;
+}
+
+.error-message {
+    height: 1.2rem;
+    opacity: 0;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+
+
+
+
+/* Header */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 30px;
+    height: 70px;
+    border-bottom: 2px solid black;
+}
+
+header a, span {
+    font-size: 1.1rem;
+}
+
+
+
+
+/* Home page */
+#home-page-content {
+    height: 100%;
+}
+
+.user-list {
+    float: left;
+    width: 50%;
+    padding: 20px 30px;
+    height: 100%;
+    border-right: 1px solid black;
+}
+
+.user-list ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+#my-repositories-unauthorized {
+    text-align: center;
+}
+
+.index-repositories {
+    width: 50%;
+    border-left: 1px solid black;
+    padding: 20px 30px;
+    height: 100%;
+    float: right;
+}
+
+#my-repositories-list {
+    list-style: none;
+    padding: 0;
+}
+
+
+
+
+
+/* Стили для форм */
+.form-container {
+    width: 500px;
+    margin: 50px auto;
+    padding: 20px 30px;
+    border: 2px solid black;
+    border-radius: 10px;
+}
+
+.form-container h4 {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-control {
+    border: 1px solid black;
+}
+

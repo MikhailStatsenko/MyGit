@@ -12,6 +12,7 @@ import java.util.Map;
 
 public interface FileService {
     Object getFileOrDirectoryContents(RepositoryContext repoContext, String path) throws IOException;
+    Map<String, String> getDirectoryContents(String repoPath) throws IOException;
     String getFileContent(Path filePath) throws IOException;
     Map<String, String> getDirectoryContents(Path dirPath) throws IOException;
 

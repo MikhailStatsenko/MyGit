@@ -3,6 +3,7 @@ package com.vcs.mygit.git;
 import com.vcs.mygit.annotation.RepositoryOwnerAccess;
 import com.vcs.mygit.git.dto.RepositoryContext;
 import com.vcs.mygit.git.dto.response.DeleteFileResponse;
+import com.vcs.mygit.git.dto.response.RepositoryContentsResponse;
 import com.vcs.mygit.git.dto.response.UploadFilesResponse;
 import com.vcs.mygit.git.service.FileService;
 import com.vcs.mygit.git.util.PathExtractor;
@@ -15,12 +16,23 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/files")
+@RequestMapping("api/file")
 @RequiredArgsConstructor
 public class FileController {
     private final FileService fileService;
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<?> getRepositoryContents(
+            @PathVariable String userId
+    ) throws IOException {
+        Map<String, String> dirContents = fileService.getDirectoryContents(userId);
+        var response = new RepositoryContentsResponse(dirContents.keySet());
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/{userId}/{repositoryName}/**")
     public ResponseEntity<?> getFileOrDirectoryContents(
             @PathVariable String userId,
@@ -37,7 +49,8 @@ public class FileController {
     public ResponseEntity<UploadFilesResponse> uploadFilesToWorkingDirectory(
             @PathVariable String userId,
             @PathVariable String repositoryName,
-            @RequestParam(value = "files", required = false) MultipartFile[] files
+            @RequestParam(value = "files", required = false) MultipartFile[] files,
+            HttpServletRequest httpServletRequest
     ) throws IOException {
         var repositoryContext = new RepositoryContext(userId, repositoryName);
         UploadFilesResponse response = fileService.uploadFiles(repositoryContext, files);

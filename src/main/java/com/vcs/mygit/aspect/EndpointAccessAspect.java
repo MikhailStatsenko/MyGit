@@ -15,24 +15,21 @@ import javax.servlet.http.HttpServletRequest;
 @RequiredArgsConstructor
 public class EndpointAccessAspect {
     private final JwtService jwtService;
-
-    @Around("@annotation(com.vcs.mygit.annotation.RepositoryOwnerAccess) && args(userId, ..)")
-    public Object checkOwnerAccessForUpload(ProceedingJoinPoint joinPoint, String userId) throws Throwable {
-        HttpServletRequest request = getRequestFromMethodArguments(joinPoint.getArgs());
-
+    @Around(value = "@annotation(com.vcs.mygit.annotation.RepositoryOwnerAccess) && args(userId, request, ..)",
+            argNames = "joinPoint,userId,request")
+    public Object checkOwnerAccessForUpload(
+            ProceedingJoinPoint joinPoint,
+            String userId,
+            HttpServletRequest request
+    ) throws Throwable {
         String token = jwtService.extractTokenFromRequest(request);
+        if (jwtService.isTokenExpired(token))
+            throw new AccessDeniedException("Token expired");
+
         String username = jwtService.extractUserName(token);
         if (!username.equals(userId)) {
-            throw new AccessDeniedException("Access is denied");
+            throw new AccessDeniedException("Access denied");
         }
         return joinPoint.proceed();
-    }
-    private HttpServletRequest getRequestFromMethodArguments(Object[] args) {
-        for (Object arg : args) {
-            if (arg instanceof HttpServletRequest) {
-                return (HttpServletRequest) arg;
-            }
-        }
-        throw new IllegalArgumentException("HttpServletRequest argument not found");
     }
 }
