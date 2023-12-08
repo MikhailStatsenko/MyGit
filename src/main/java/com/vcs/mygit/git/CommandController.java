@@ -3,7 +3,7 @@ package com.vcs.mygit.git;
 import com.vcs.mygit.annotation.RepositoryOwnerAccess;
 import com.vcs.mygit.git.dto.RepositoryContext;
 import com.vcs.mygit.git.dto.response.CommitResponse;
-import com.vcs.mygit.git.service.impl.CommandServiceImpl;
+import com.vcs.mygit.git.service.CommandService;
 import com.vcs.mygit.git.util.DateFormatter;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -22,7 +22,7 @@ import java.util.Set;
 @RequestMapping("api/git")
 @RequiredArgsConstructor
 public class CommandController {
-    private final CommandServiceImpl gitService;
+    private final CommandService commandService;
 
     @RepositoryOwnerAccess
     @PostMapping("/init/{userId}/{repositoryName}")
@@ -32,7 +32,7 @@ public class CommandController {
             HttpServletRequest request
     ) throws GitAPIException, IOException {
         var repositoryContext = new RepositoryContext(userId, repositoryName);
-        gitService.init(repositoryContext);
+        commandService.init(repositoryContext);
         String basePath = request.getRequestURL().toString().replace("/git/init", "/files");
         URI location = URI.create(basePath);
         return ResponseEntity.created(location).build();
@@ -47,7 +47,7 @@ public class CommandController {
             HttpServletRequest httpServletRequest
     ) throws GitAPIException, IOException {
         var repositoryContext = new RepositoryContext(userId, repositoryName);
-        RevCommit commitInfo = gitService.commit(repositoryContext, message);
+        RevCommit commitInfo = commandService.commit(repositoryContext, message);
         Date commitDate = commitInfo.getAuthorIdent().getWhen();
         return ResponseEntity.ok(new CommitResponse(
                 commitInfo.getId().getName(),
@@ -65,7 +65,7 @@ public class CommandController {
             HttpServletRequest httpServletRequest
     ) throws GitAPIException, IOException {
         var repositoryContext = new RepositoryContext(userId, repositoryName);
-        Set<String> addedFiles = gitService.add(repositoryContext, pattern);
+        Set<String> addedFiles = commandService.add(repositoryContext, pattern);
         return ResponseEntity.ok(addedFiles);
     }
 
@@ -77,7 +77,7 @@ public class CommandController {
             HttpServletRequest httpServletRequest
     ) throws GitAPIException, IOException {
         var repositoryContext = new RepositoryContext(userId, repositoryName);
-        Set<String> addedFiles = gitService.addAll(repositoryContext);
+        Set<String> addedFiles = commandService.addAll(repositoryContext);
         return ResponseEntity.ok(addedFiles);
     }
 }

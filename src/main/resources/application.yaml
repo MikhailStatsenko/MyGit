@@ -18,4 +18,5 @@ spring:
 token:
   signing:
     key: 6cf5d4dc70dff0438476871e9e65afd351663dd721d6dc8f1febd44260a81b31
-
+#server:
+#  port: 80
