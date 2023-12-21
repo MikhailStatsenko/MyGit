@@ -1,6 +1,7 @@
 package com.vcs.mygit.git;
 
 import com.vcs.mygit.annotation.RepositoryOwnerAccess;
+import com.vcs.mygit.git.dto.CommitInfo;
 import com.vcs.mygit.git.dto.RepositoryContext;
 import com.vcs.mygit.git.dto.response.CommitResponse;
 import com.vcs.mygit.git.service.CommandService;
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 
@@ -79,6 +81,18 @@ public class CommandController {
         var repositoryContext = new RepositoryContext(userId, repositoryName);
         Set<String> addedFiles = commandService.addAll(repositoryContext);
         return ResponseEntity.ok(addedFiles);
+    }
+
+    @RepositoryOwnerAccess
+    @GetMapping("/log/{userId}/{repositoryName}")
+    public ResponseEntity<List<CommitInfo>> getCommitLog(
+            @PathVariable String userId,
+            @PathVariable String repositoryName,
+            HttpServletRequest httpServletRequest
+    ) throws GitAPIException, IOException {
+        var repositoryContext = new RepositoryContext(userId, repositoryName);
+        List<CommitInfo> commitLog = commandService.getCommitLog(repositoryContext);
+        return ResponseEntity.ok(commitLog);
     }
 }
 

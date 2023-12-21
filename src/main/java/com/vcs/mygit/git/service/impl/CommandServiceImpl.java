@@ -1,8 +1,10 @@
 package com.vcs.mygit.git.service.impl;
 
 import com.vcs.mygit.exception.NothingToCommitException;
+import com.vcs.mygit.git.dto.CommitInfo;
 import com.vcs.mygit.git.dto.RepositoryContext;
 import com.vcs.mygit.git.service.CommandService;
+import com.vcs.mygit.git.util.DateFormatter;
 import com.vcs.mygit.git.util.GitRepositoryOpener;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
@@ -13,8 +15,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class CommandServiceImpl implements CommandService, GitRepositoryOpener {
@@ -82,5 +83,27 @@ public class CommandServiceImpl implements CommandService, GitRepositoryOpener {
     @Override
     public Set<String> addAll(RepositoryContext repoContext) throws IOException, GitAPIException {
         return add(repoContext, ".");
+    }
+
+    @Override
+    public List<CommitInfo> getCommitLog(RepositoryContext repoContext) throws IOException, GitAPIException {
+        Path repositoryPath = repoContext.getRepositoryPath();
+
+        try (Git git = openGitRepository(repositoryPath)) {
+            Iterable<RevCommit> logs = git.log().all().call();
+            List<CommitInfo> commitLog = new ArrayList<>();
+
+            for (RevCommit commit : logs) {
+                Date commitDate = commit.getAuthorIdent().getWhen();
+                CommitInfo commitInfo = new CommitInfo(
+                        commit.getId().getName(),
+                        DateFormatter.format(commitDate),
+                        commit.getFullMessage()
+                );
+                commitLog.add(commitInfo);
+            }
+
+            return commitLog;
+        }
     }
 }

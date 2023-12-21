@@ -3,7 +3,7 @@ package com.vcs.mygit.security;
 import com.vcs.mygit.security.dto.request.LoginRequest;
 import com.vcs.mygit.security.dto.request.RegistrationRequest;
 import com.vcs.mygit.security.dto.response.JwtAuthenticationResponse;
-import com.vcs.mygit.user.Role;
+//import com.vcs.mygit.user.Role;
 import com.vcs.mygit.user.User;
 import com.vcs.mygit.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .username(request.username())
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
-                .role(Role.USER)
+//                .role(Role.USER)
                 .build();
         userRepository.save(user);
         var jwt = jwtService.generateToken(user);

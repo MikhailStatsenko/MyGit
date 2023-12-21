@@ -17,3 +17,5 @@ public interface GitRepositoryOpener {
         return new Git(repository);
     }
 }
+
+

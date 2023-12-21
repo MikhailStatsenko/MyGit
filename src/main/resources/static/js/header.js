@@ -33,7 +33,7 @@ function isTokenExpired(token) {
     if (token) {
         try {
             const tokenData = JSON.parse(atob(token.split('.')[1]));
-            const currentTime = Math.floor(Date.now() / 1000); // Текущее время в секундах
+            const currentTime = Math.floor(Date.now() / 1000);
 
             return currentTime > tokenData.exp;
         } catch (error) {

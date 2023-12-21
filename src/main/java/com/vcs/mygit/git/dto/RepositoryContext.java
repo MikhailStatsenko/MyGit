@@ -10,6 +10,9 @@ public record RepositoryContext(String userId, String repositoryName) {
     }
 
     public Path getRepositoryPath() {
-        return Path.of(rootPath + "/" + userId + "/" + repositoryName);
+        return Path.of(rootPath + "/" + userId + "/" +
+                repositoryName);
     }
 }
+
+

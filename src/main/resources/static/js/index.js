@@ -40,7 +40,6 @@ function handleContentDisplayChange() {
 document.addEventListener('DOMContentLoaded', handleContentDisplayChange);
 
 
-
 document.addEventListener('DOMContentLoaded', function() {
     const jwtToken = localStorage.getItem('jwtToken');
 

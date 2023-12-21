@@ -11,6 +11,7 @@ function showRepositoryContents(userId, repositoryName) {
 }
 
 const upTheHierarchyElement = document.getElementById('up-the-hierarchy');
+const deleteDirOrFile = document.getElementById('delete-dir-or-file');
 function fetchRepositoryContent() {
     const jwtToken = localStorage.getItem('jwtToken');
     fetch(`/api/file/${path}`, {
@@ -42,7 +43,7 @@ function fetchRepositoryContent() {
                     itemLink.addEventListener('click', function (event) {
                         event.preventDefault();
                         path += '/' + itemName;
-                        readRile();
+                        readFile();
                     });
                 }
 
@@ -72,21 +73,24 @@ function fetchRepositoryContent() {
 
             if (path.split("/").length > 2) {
                 upTheHierarchyElement.classList.remove("hidden")
+                deleteDirOrFile.classList.remove("hidden")
             } else {
                 upTheHierarchyElement.classList.add("hidden")
+                deleteDirOrFile.classList.add("hidden")
             }
         })
         .catch(error => console.error('Ошибка при загрузке содержимого репозитория:', error));
 }
 
-upTheHierarchyElement.addEventListener('click', function () {
+upTheHierarchyElement.addEventListener('click', function () {removeLastPathPart()})
+
+function removeLastPathPart() {
     var lastSlashIndex = path.lastIndexOf('/');
-    console.log(path)
     path = path.substring(0, lastSlashIndex);
     fetchRepositoryContent();
-})
+}
 
-function readRile() {
+function readFile() {
     const jwtToken = localStorage.getItem('jwtToken');
     fetch(`/api/file/${path}`, {
         method: 'GET',
@@ -109,10 +113,10 @@ function readRile() {
                 text.classList.add("text-secondary");
                 text.textContent = "Файл не содержит данных"
             }
-            text.classList.add("text-document");
             text.classList.add("p-2");
             text.classList.add("m-0");
 
+            cell.classList.add("text-document");
             cell.classList.add("m-0");
             cell.classList.add("p-0");
 
@@ -123,49 +127,11 @@ function readRile() {
 
             if (path.split("/").length > 2) {
                 upTheHierarchyElement.classList.remove("hidden")
+                deleteDirOrFile.classList.remove("hidden")
             } else {
                 upTheHierarchyElement.classList.add("hidden")
+                deleteDirOrFile.classList.add("hidden")
             }
         })
         .catch(error => console.error('Ошибка при загрузке содержимого репозитория:', error));
 }
-
-
-
-
-
-
-
-
-
-const downloadButton = document.getElementById('download-repository-archive');
-downloadButton.addEventListener('click', function () {
-    const jwtToken = localStorage.getItem('jwtToken');
-
-    fetch(`/api/file/download/${userId_}/${repositoryName_}`, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${jwtToken}`
-        }
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Ошибка загрузки архива');
-            }
-            return response.blob();
-        })
-        .then(blob => {
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${repositoryName_}.zip`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-        })
-        .catch(error => console.error('Ошибка при загрузке архива репозитория:', error));
-
-})
-
-
-
