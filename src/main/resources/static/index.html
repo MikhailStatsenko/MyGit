@@ -21,6 +21,7 @@
     </div>
   </header>
 
+
   <main class="bg-light">
     <!-- Главная страница -->
     <div id="home-page-content">
@@ -34,13 +35,14 @@
       <div id="my-repositories" class="index-repositories">
         <h4 id="repos-title"></h4>
         <div id="add-new-repository">
-          <input type="text" class="form-control border-2" id="new-repository-name" name="new-repository-name">
+          <input type="text" class="form-control border-2" id="new-repository-name" name="new-repository-name" placeholder="Название нового репозитория">
           <button onclick="addRepository(event)" type="submit" class="btn btn-warning border-black border-2">Добавить</button>
         </div>
         <div id="add-repository-error-message" class="error-message text-danger">Название репозитория не соответствует формату</div>
         <ul id="my-repositories-list"></ul>
       </div>
     </div>
+
 
 
 
@@ -94,6 +96,8 @@
               <div id="repository-navigation">
                 <i class="fas fa-arrow-up repository-nav-button" id="up-the-hierarchy"></i>
                 <i class="fas fa-trash repository-nav-button" id="delete-dir-or-file"></i>
+                <i class="fas fa-file-download repository-nav-button" id="upload-files-to-repository"></i>
+                <i class="fas fa-folder-plus repository-nav-button" id="create-directory"></i>
                 <i class="repository-nav-button" style="padding-top: 0" id="commit-changes-btn">
                   <svg xmlns="http://www.w3.org/2000/svg" height="18" width="17" viewBox="0 0 640 512">
                     <path d="M320 336a80 80 0 1 0 0-160 80 80 0 1 0 0 160zm156.8-48C462 361 397.4 416 320 416s-142-55-156.8-128H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H163.2C178 151 242.6 96 320 96s142 55 156.8 128H608c17.7 0 32 14.3 32 32s-14.3 32-32 32H476.8z"/>
@@ -101,7 +105,7 @@
                 </i>
                 <i class="fas fa-code-branch repository-nav-button" id="branches-btn"></i>
                 <i class="fas fa-history repository-nav-button" id="git-log-btn"></i>
-                <i class="fas fa-download repository-nav-button" id="download-repository-archive"></i>
+                <i class="fas fa-save repository-nav-button" id="download-repository-archive"></i>
                 <i class="fas fa-home repository-nav-button" id="back-from-repository"></i>
               </div>
             </th>
@@ -143,6 +147,7 @@
 
 
 
+
     <!-- Страница для работы с ветками -->
     <div id="branches-page-content" class="hidden">
       <div id="branches-content">
@@ -159,15 +164,27 @@
     </div>
 
 
+
+
     <!-- Страница для работы со статусом файлов и коммитом изменений -->
     <div id="commit-page-content">
-      <h4 id="untracked-files-header"></h4>
-      <ul id="untracked-files-list" class="list-group"></ul>
-      <h4>Modified files</h4>
-      <ul id="modified-files-list" class="list-group"></ul>
-      <div id="commit-form">
-        <input type="text" id="commit-message" placeholder="Enter commit message">
-        <button onclick="commitChanges()">Commit</button>
+      <div id="commit-content">
+        <div id="untracked-files-header-wrapper" class="d-flex justify-content-between align-items-center">
+          <h4 id="untracked-files-header"></h4>
+        </div>
+        <ul id="unindexed-files-list" class="list-group"></ul>
+        <div id="indexed-files-header-wrapper" class="d-flex justify-content-between align-items-center">
+          <h4>Файлы в индексе</h4>
+        </div>
+        <ul id="indexed-files-list" class="list-group"></ul>
+        <p id="no-files-in-index-msg">Нет файлов в индексе</p>
+        <div id="commit-form">
+          <textarea type="text" class="form-control" id="commit-message" placeholder="Сообщение к коммиту"></textarea>
+          <div class="d-flex align-items-end justify-content-between">
+            <span id="current-branch-to-commit"></span>
+            <button class="btn btn-warning disabled" id="commit-btn" onclick="commitChanges()">Commit</button>
+          </div>
+        </div>
       </div>
     </div>
 

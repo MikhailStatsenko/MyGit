@@ -99,15 +99,21 @@ function switchBranch(branchName) {
     })
         .then(response => response.json())
         .then(data => {
-            fetchBranches(); // Перезагрузка списка веток после смены ветки
+            fetchBranches();
         })
         .catch(error => console.error('Ошибка при смене ветки:', error));
 }
 
+var firstBranchLoad = true;
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('branches-btn').addEventListener('click', function() {
-        showElement('branches-page-content');
         fetchBranches();
+        if (firstBranchLoad) {
+            setTimeout(() => showElement('branches-page-content'), 1000);
+            firstBranchLoad = false;
+        } else {
+            setTimeout(() => showElement('branches-page-content'), 50);
+        }
     });
 });
 

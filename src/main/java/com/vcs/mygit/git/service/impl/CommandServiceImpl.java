@@ -53,7 +53,9 @@ public class CommandServiceImpl implements CommandService, GitRepositoryOpener {
 
         try (Git git = openGitRepository(repositoryPath)) {
             Status status = git.status().call();
-            if (status.getAdded().isEmpty() && status.getChanged().isEmpty() && status.getRemoved().isEmpty()) {
+            if (status.getAdded().isEmpty()
+                    && status.getChanged().isEmpty()
+                    && status.getRemoved().isEmpty()) {
                 throw new NothingToCommitException("Nothing to commit, working directory clean");
             }
             return git.commit().setMessage(message).call();
@@ -87,6 +89,21 @@ public class CommandServiceImpl implements CommandService, GitRepositoryOpener {
     }
 
     @Override
+    public Set<String> remove(RepositoryContext repoContext, String filePath) throws IOException, GitAPIException {
+        if (filePath == null || filePath.isBlank()) {
+            throw new IllegalArgumentException("File path parameter must be present");
+        }
+        Path repositoryPath = repoContext.getRepositoryPath();
+        try (Git git = openGitRepository(repositoryPath)) {
+            git.reset().addPath(filePath).call();
+
+            Status status = git.status().call();
+
+            return new HashSet<>(status.getUntracked());
+        }
+    }
+
+    @Override
     public List<CommitInfo> log(RepositoryContext repoContext, String branch) throws IOException, GitAPIException {
         Path repositoryPath = repoContext.getRepositoryPath();
 
@@ -115,14 +132,15 @@ public class CommandServiceImpl implements CommandService, GitRepositoryOpener {
         try (Git git = openGitRepository(repositoryPath)) {
             Status status = git.status().call();
 
-            Set<String> untracked = new HashSet<>(status.getUntracked());
+            Set<String> unindexed = new HashSet<>(status.getUntracked());
+            unindexed.addAll(status.getModified());
 
-            Set<String> modified = new HashSet<>(status.getMissing());
-            modified.addAll(status.getModified());
-            modified.addAll(status.getRemoved());
-            modified.addAll(status.getAdded());
+            Set<String> indexed = new HashSet<>(status.getMissing());
+            indexed.addAll(status.getChanged());
+            indexed.addAll(status.getRemoved());
+            indexed.addAll(status.getAdded());
 
-            return new StatusResponse(untracked, modified);
+            return new StatusResponse(unindexed, indexed);
         }
     }
 }

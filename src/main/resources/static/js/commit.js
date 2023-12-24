@@ -1,39 +1,15 @@
-document.getElementById('commit-changes-btn') .addEventListener("click", function() {
-    showElement('commit-page-content')
-    fetchStatusData();
-});
-
-// const listItem = document.createElement('li');
-// listItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
-//
-// const branchName = document.createElement('span');
-// branchName.textContent = branch;
-// branchName.style.flex = '1';
-//
-// if (data.currentBranch !== branch) {
-//     branchName.style.cursor = 'pointer';
-//     branchName.addEventListener('click', () => {switchBranch(branch);});
-// }
-//
-// const activeBranchIcon = document.createElement('i');
-// activeBranchIcon.classList.add('fas', 'fa-check');
-// if (data.currentBranch !== branch) {
-//     activeBranchIcon.classList.add('text-white')
-// }
-// listItem.appendChild(activeBranchIcon);
-//
-// const deleteIcon = document.createElement('i');
-// deleteIcon.classList.add('fas', 'fa-trash', 'ml-2');
-// if (data.currentBranch !== branch) {
-//     deleteIcon.style.cursor = 'pointer';
-//     deleteIcon.addEventListener('click', () => deleteBranch(branch));
-// } else {
-//     deleteIcon.classList.add('text-muted');
-// }
-//
-// listItem.appendChild(branchName);
-// listItem.appendChild(deleteIcon);
-// branchesList.appendChild(listItem);
+var firstLoad = true
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('commit-changes-btn') .addEventListener("click", function() {
+        fetchStatusData();
+        if (firstLoad) {
+            setTimeout(() => showElement('commit-page-content'), 1000);
+            firstLoad = false;
+        } else {
+            setTimeout(() => showElement('commit-page-content'), 200);
+        }
+    });
+})
 
 function fetchStatusData() {
     const jwtToken = localStorage.getItem('jwtToken');
@@ -46,34 +22,72 @@ function fetchStatusData() {
     })
         .then(response => response.json())
         .then(data => {
-            const untrackedList = document.getElementById('untracked-files-list');
-            const modifiedList = document.getElementById('modified-files-list');
+            const untrackedList = document.getElementById('unindexed-files-list');
+            const modifiedList = document.getElementById('indexed-files-list');
             const untrackedFilesHeader = document.getElementById('untracked-files-header');
+            const nothingToCommit = document.getElementById('no-files-in-index-msg');
+            const commitBtn = document.getElementById('commit-btn');
 
             untrackedList.innerHTML = '';
             modifiedList.innerHTML = '';
+            setCurrentBranch();
 
-            if (data.untracked.length > 0) {
-                untrackedFilesHeader.innerText = 'Untracked files';
-                data.untracked.forEach(file => {
+            const backFromCommit = document.createElement('i');
+            backFromCommit.classList.add('fas', 'fa-arrow-left', 'repository-nav-button');
+            backFromCommit.addEventListener('click', () => {
+                backFromCommit.remove();
+                showElement('repository-page-content');
+            });
+
+            if (data.unindexed.length > 0) {
+                untrackedList.classList.remove('hidden');
+                untrackedFilesHeader.innerText = 'Неотслеживаемые файлы';
+
+                data.unindexed.sort();
+                data.unindexed.forEach(file => {
+                    const addToIndex = document.createElement('i');
+                    addToIndex.classList.add('fas', 'fa-plus');
+                    addToIndex.style.cursor = 'pointer';
+                    addToIndex.addEventListener('click', () => addFileToIndex(file));
+
                     const listItem = document.createElement('li');
+                    listItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
                     listItem.textContent = file;
+                    listItem.appendChild(addToIndex);
                     untrackedList.appendChild(listItem);
                 });
+
+                const wrapper = document.getElementById('untracked-files-header-wrapper')
+                wrapper.appendChild(backFromCommit);
             } else {
+                const wrapper = document.getElementById('indexed-files-header-wrapper')
+                wrapper.appendChild(backFromCommit);
+                untrackedList.classList.add('hidden');
                 untrackedFilesHeader.innerText = '';
             }
 
-            if (data.modified.length > 0) {
-                data.modified.forEach(file => {
+            if (data.indexed.length > 0) {
+                commitBtn.classList.remove('disabled');
+                modifiedList.classList.remove('hidden');
+                nothingToCommit.classList.add('hidden');
+
+                data.indexed.sort();
+                data.indexed.forEach(file => {
+                    const removeFromIndex = document.createElement('i');
+                    removeFromIndex.classList.add('fas', 'fa-minus');
+                    removeFromIndex.style.cursor = 'pointer';
+                    removeFromIndex.addEventListener('click', () => removeFileFromIndex(file));
+
                     const listItem = document.createElement('li');
+                    listItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
                     listItem.textContent = file;
+                    listItem.appendChild(removeFromIndex);
                     modifiedList.appendChild(listItem);
                 });
             } else {
-                const nothingToCommit = document.createElement('p');
-                nothingToCommit.textContent = "Nothing to commit";
-                modifiedList.appendChild(nothingToCommit);
+                commitBtn.classList.add('disabled');
+                modifiedList.classList.add('hidden');
+                nothingToCommit.classList.remove('hidden')
             }
         })
         .catch(error => console.error('Error fetching status data:', error));
@@ -95,7 +109,62 @@ function commitChanges() {
                 fetchStatusData();
             } else {
                 console.error('Error committing changes:', response.status);
+                console.error(response.text());
             }
         })
         .catch(error => console.error('Error committing changes:', error));
+}
+
+function addFileToIndex(file) {
+    const jwtToken = localStorage.getItem('jwtToken');
+    fetch(`/api/git/add/${userId_}/${repositoryName_}?pattern=${file}`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${jwtToken}`,
+            'Content-Type': 'application/json'
+        }
+    }).then(response => response.json())
+        .then(data => {
+            fetchStatusData();
+        })
+        .catch(error => console.error('Ошибка при добавлении файла в индекс:', error));
+}
+
+function removeFileFromIndex(file) {
+    const jwtToken = localStorage.getItem('jwtToken');
+    fetch(`/api/git/remove/${userId_}/${repositoryName_}?pattern=${file}`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${jwtToken}`,
+            'Content-Type': 'application/json'
+        }
+    }).then(response => response.json())
+        .then(data => {
+            fetchStatusData();
+        })
+        .catch(error => console.error('Ошибка при удалении файла из индекса:', error));
+}
+
+function setCurrentBranch() {
+    const jwtToken = localStorage.getItem('jwtToken');
+    fetch(`/api/git/branch/list/${userId_}/${repositoryName_}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${jwtToken}`,
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const currentBranch = document.getElementById('current-branch-to-commit');
+            currentBranch.innerText = `Текущая ветка: ${data.currentBranch}`;
+        })
+        .catch(error => {
+            console.error('There has been a problem with your fetch operation:', error);
+        });
 }

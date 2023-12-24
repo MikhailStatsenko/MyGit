@@ -16,7 +16,15 @@ public interface FileService {
     String getFileContent(Path filePath) throws IOException;
     Map<String, String> getDirectoryContents(Path dirPath) throws IOException;
 
-    UploadFilesResponse uploadFiles(RepositoryContext repoContext, MultipartFile[] files) throws IOException;
+//    UploadFilesResponse uploadFiles(RepositoryContext repoContext, MultipartFile[] files) throws IOException;
+
+    UploadFilesResponse uploadFiles(
+            RepositoryContext repoContext,
+            String path,
+            MultipartFile[] files
+    ) throws IOException;
+
+    void createNewDirectory(RepositoryContext repoContext, String path, String dirName) throws IOException;
 
     void getRepositoryArchive(RepositoryContext repoContext, HttpServletResponse response) throws IOException;
     List<String> deleteFile(RepositoryContext repoContext, String filePath) throws IOException;

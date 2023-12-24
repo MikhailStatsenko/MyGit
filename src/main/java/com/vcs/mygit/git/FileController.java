@@ -45,17 +45,33 @@ public class FileController {
     }
 
     @RepositoryOwnerAccess
-    @PostMapping("/upload/{userId}/{repositoryName}")
+    @PostMapping("/upload/{userId}/{repositoryName}/**")
     public ResponseEntity<UploadFilesResponse> uploadFilesToWorkingDirectory(
             @PathVariable String userId,
             @PathVariable String repositoryName,
             @RequestParam(value = "files", required = false) MultipartFile[] files,
             HttpServletRequest httpServletRequest
     ) throws IOException {
+        String requestPath = PathExtractor.extractPathFromRequest(httpServletRequest);
         var repositoryContext = new RepositoryContext(userId, repositoryName);
-        UploadFilesResponse response = fileService.uploadFiles(repositoryContext, files);
+        UploadFilesResponse response = fileService.uploadFiles(repositoryContext, requestPath, files);
         return ResponseEntity.ok(response);
     }
+
+    @RepositoryOwnerAccess
+    @PostMapping("/add-directory/{userId}/{repositoryName}/**")
+    public ResponseEntity<String> createNewDirectory(
+            @PathVariable String userId,
+            @PathVariable String repositoryName,
+            @RequestParam String name,
+            HttpServletRequest httpServletRequest
+    ) throws IOException {
+        String requestPath = PathExtractor.extractPathFromRequest(httpServletRequest);
+        var repositoryContext = new RepositoryContext(userId, repositoryName);
+        fileService.createNewDirectory(repositoryContext, requestPath, name);
+        return ResponseEntity.ok("Directory created successfully");
+    }
+
 
     @GetMapping("/download/{userId}/{repositoryName}")
     public void downloadRepositoryArchive(

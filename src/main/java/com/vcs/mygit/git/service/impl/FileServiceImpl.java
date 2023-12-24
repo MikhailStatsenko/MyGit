@@ -9,10 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.stream.Stream;
@@ -96,35 +93,59 @@ public class FileServiceImpl implements FileService {
     @Override
     public UploadFilesResponse uploadFiles(
             RepositoryContext repoContext,
+            String path,
             MultipartFile[] files
     ) throws IOException {
+        Path repositoryPath = repoContext.getRepositoryPath();
+
         if (files == null || files.length == 0)
             throw new IllegalArgumentException("There are no files to upload");
 
-        Path repositoryPath = repoContext.getRepositoryPath();
+        Path uploadPath = repositoryPath.resolve(path);
 
-        Set<String> existingFiles = getExistingFiles(repositoryPath);
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+        }
 
-        List<String> rejectedFiles = new ArrayList<>();
+        Set<String> existingFiles = getExistingFiles(uploadPath);
+
+        List<String> updatedFiles = new ArrayList<>();
         Map<String, String> addedFiles = new HashMap<>();
         for (MultipartFile file : files) {
             String fileName = file.getOriginalFilename();
 
             if (fileName == null || fileName.isBlank()) {
-                throw new IllegalArgumentException("The file must have non-blank name");
+                throw new IllegalArgumentException("The file must have a non-blank name");
             }
 
             if (existingFiles.contains(fileName)) {
-                rejectedFiles.add(fileName);
+                Path filePath = uploadPath.resolve(fileName);
+                Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+                updatedFiles.add(fileName);
                 continue;
             }
 
-            Path filePath = repositoryPath.resolve(fileName);
+            Path filePath = uploadPath.resolve(fileName);
             Files.copy(file.getInputStream(), filePath);
             addedFiles.put(fileName, filePath.toString());
         }
-        return new UploadFilesResponse(rejectedFiles, addedFiles);
+        return new UploadFilesResponse(updatedFiles, addedFiles);
     }
+
+    @Override
+    public void createNewDirectory(RepositoryContext repoContext, String path, String dirName) throws IOException {
+        Path repositoryPath = repoContext.getRepositoryPath();
+
+        Path newDirectoryPath = repositoryPath.resolve(path).resolve(dirName);
+
+        if (!Files.exists(newDirectoryPath)) {
+            System.out.println(newDirectoryPath);
+            Files.createDirectories(newDirectoryPath);
+        } else {
+            throw new IllegalArgumentException("Directory already exists");
+        }
+    }
+
 
     @Override
     public void getRepositoryArchive(

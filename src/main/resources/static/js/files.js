@@ -1,4 +1,6 @@
 const downloadButton = document.getElementById('download-repository-archive');
+const uploadFiles = document.getElementById('upload-files-to-repository');
+
 downloadButton.addEventListener('click', function () {
     const jwtToken = localStorage.getItem('jwtToken');
 
@@ -52,6 +54,7 @@ function showDeleteConfirmation() {
                     fetchRepositoryContent();
                     showElement('repository-page-content');
                 } else {
+                    console.log(response.text())
                     console.error("Ошибка при удалении");
                 }
             })
@@ -74,4 +77,38 @@ window.addEventListener("click", function (event) {
     if (event.target === modal) {
         modal.style.display = "none";
     }
+});
+
+uploadFiles.addEventListener('click', function () {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.multiple = true;
+    input.style.display = 'none';
+
+    input.addEventListener('change', function (event) {
+        const files = event.target.files;
+
+        const formData = new FormData();
+        for (let i = 0; i < files.length; i++) {
+            formData.append('files', files[i]);
+        }
+
+        const jwtToken = localStorage.getItem('jwtToken');
+        fetch(`/api/file/upload/${path}`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Authorization': `Bearer ${jwtToken}`
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Files uploaded:', data);
+                fetchRepositoryContent();
+            })
+            .catch(error => {
+                console.error('Error uploading files:', error);
+            });
+    });
+    input.click();
 });

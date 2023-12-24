@@ -25,6 +25,8 @@ public interface CommandService {
     Set<String> addAll(RepositoryContext repoContext)
             throws IOException, GitAPIException;
 
+    Set<String> remove(RepositoryContext repoContext, String filePath) throws IOException, GitAPIException;
+
     List<CommitInfo> log(RepositoryContext repoContext, String branch) throws IOException, GitAPIException;
 
     StatusResponse status(RepositoryContext repoContext) throws IOException, GitAPIException;

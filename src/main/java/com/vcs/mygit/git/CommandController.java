@@ -64,7 +64,7 @@ public class CommandController {
     public ResponseEntity<Set<String>> addFileToRepository(
             @PathVariable String userId,
             @PathVariable String repositoryName,
-            @RequestParam(required = false) String pattern,
+            @RequestParam String pattern,
             HttpServletRequest httpServletRequest
     ) throws GitAPIException, IOException {
         var repositoryContext = new RepositoryContext(userId, repositoryName);
@@ -82,6 +82,19 @@ public class CommandController {
         var repositoryContext = new RepositoryContext(userId, repositoryName);
         Set<String> addedFiles = commandService.addAll(repositoryContext);
         return ResponseEntity.ok(addedFiles);
+    }
+
+    @RepositoryOwnerAccess
+    @PostMapping("/remove/{userId}/{repositoryName}")
+    public ResponseEntity<Set<String>> removeFileFromStagingArea(
+            @PathVariable String userId,
+            @PathVariable String repositoryName,
+            @RequestParam String pattern,
+            HttpServletRequest httpServletRequest
+    ) throws GitAPIException, IOException {
+        var repositoryContext = new RepositoryContext(userId, repositoryName);
+        Set<String> removedFiles = commandService.remove(repositoryContext, pattern);
+        return ResponseEntity.ok(removedFiles);
     }
 
     @RepositoryOwnerAccess

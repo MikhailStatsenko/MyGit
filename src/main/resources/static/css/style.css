@@ -385,3 +385,66 @@ header a, span {
 #branches-list .fa-check:before {
     margin-right: 5px;
 }
+
+
+
+
+
+
+
+/* Статус файлов и коммит */
+#commit-content {
+    padding-top: 2rem;
+    padding-left: 25%;
+    padding-right: 25%;
+}
+
+#unindexed-files-list,
+#indexed-files-list {
+    border: 2px solid black;
+    box-shadow: 3px 3px 0 0 rgba(0, 0, 0, 1);
+    margin-bottom: 1.5rem;
+}
+
+#unindexed-files-list li,
+#indexed-files-list li {
+    border: none;
+    border-bottom: 2px solid black;
+}
+
+#unindexed-files-list li:last-child,
+#indexed-files-list li:last-child {
+    border-bottom: none;
+}
+
+#commit-message {
+    width: 100%;
+    font-size: 18px;
+    padding: 3px 5px;
+    height: 90px;
+    resize: none;
+    border: 2px solid black;
+}
+
+#commit-btn {
+    margin-top: 1rem;
+    float: right;
+    width: 10rem;
+    border: 2px solid black;
+}
+
+
+
+/* Создание папки */
+.new-dir-name-input {
+    font-size: 18px;
+    box-shadow: none;
+    outline-width: 0;
+    border: none;
+    padding: 0;
+    width: 100%;
+}
+
+.new-dir-name-input.form-control {
+    box-shadow: none;
+}

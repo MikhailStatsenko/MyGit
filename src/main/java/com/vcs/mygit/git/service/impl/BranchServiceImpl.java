@@ -68,7 +68,7 @@ public class BranchServiceImpl implements BranchService, GitRepositoryOpener {
     ) throws IOException, GitAPIException {
         Path repositoryPath = repoContext.getRepositoryPath();
         try (Git git = openGitRepository(repositoryPath)) {
-            git.checkout().setName(branchName).call();
+            git.checkout().setForced(true).setName(branchName).call();
         }
     }
 
