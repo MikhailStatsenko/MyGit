@@ -3,6 +3,7 @@ package com.vcs.mygit.git.service.impl;
 import com.vcs.mygit.exception.NothingToCommitException;
 import com.vcs.mygit.git.dto.CommitInfo;
 import com.vcs.mygit.git.dto.RepositoryContext;
+import com.vcs.mygit.git.dto.response.StatusResponse;
 import com.vcs.mygit.git.service.CommandService;
 import com.vcs.mygit.git.util.DateFormatter;
 import com.vcs.mygit.git.util.GitRepositoryOpener;
@@ -86,11 +87,11 @@ public class CommandServiceImpl implements CommandService, GitRepositoryOpener {
     }
 
     @Override
-    public List<CommitInfo> getCommitLog(RepositoryContext repoContext) throws IOException, GitAPIException {
+    public List<CommitInfo> log(RepositoryContext repoContext, String branch) throws IOException, GitAPIException {
         Path repositoryPath = repoContext.getRepositoryPath();
 
         try (Git git = openGitRepository(repositoryPath)) {
-            Iterable<RevCommit> logs = git.log().all().call();
+            Iterable<RevCommit> logs = git.log().add(git.getRepository().resolve(branch)).call();
             List<CommitInfo> commitLog = new ArrayList<>();
 
             for (RevCommit commit : logs) {
@@ -104,6 +105,24 @@ public class CommandServiceImpl implements CommandService, GitRepositoryOpener {
             }
 
             return commitLog;
+        }
+    }
+
+    @Override
+    public StatusResponse status(RepositoryContext repoContext) throws IOException, GitAPIException {
+        Path repositoryPath = repoContext.getRepositoryPath();
+
+        try (Git git = openGitRepository(repositoryPath)) {
+            Status status = git.status().call();
+
+            Set<String> untracked = new HashSet<>(status.getUntracked());
+
+            Set<String> modified = new HashSet<>(status.getMissing());
+            modified.addAll(status.getModified());
+            modified.addAll(status.getRemoved());
+            modified.addAll(status.getAdded());
+
+            return new StatusResponse(untracked, modified);
         }
     }
 }

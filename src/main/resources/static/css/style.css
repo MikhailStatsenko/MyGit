@@ -60,7 +60,7 @@ header a, span {
 
 
 
-/* Home page */
+/* Главная страница */
 #home-page-content {
     height: 100%;
 }
@@ -95,12 +95,14 @@ header a, span {
     padding: 0;
 }
 
-#add-new-repository {
+#add-new-repository,
+#add-new-branch {
     display: flex;
     width: 100%;
 }
 
-#add-new-repository input {
+#add-new-repository input,
+#add-new-branch input {
     box-shadow: none;
     border-color: black;
     border-right: none;
@@ -108,7 +110,8 @@ header a, span {
     border-top-right-radius: 0;
 }
 
-#add-new-repository button {
+#add-new-repository button,
+#add-new-branch button {
     border-bottom-left-radius: 0;
     border-top-left-radius: 0;
 }
@@ -152,7 +155,11 @@ header a, span {
     text-align: left;
     box-shadow: 5px 5px 0 0 rgba(0, 0, 0, 1);
     max-height: 75vh;
-    overflow-y: scroll;
+}
+
+#repository-content-table {
+    max-width: 100%;
+    background-color: white;
 }
 
 #repository-content-table-head {
@@ -288,6 +295,10 @@ header a, span {
     list-style: none;
 }
 
+#commit-list li {
+    background-color: white;
+}
+
 #commit-list-header {
     padding-top: 2rem;
     display: flex;
@@ -319,4 +330,58 @@ header a, span {
 
 .commit-item div {
     font-weight: normal;
+}
+
+#select-branch-log {
+    width: 50%;
+    display: flex;
+    justify-content: start;
+}
+
+#select-branch-log select {
+    width: 30%;
+    border: 2px solid black;
+    outline: none;
+}
+
+
+
+
+
+
+
+/* Ветки */
+#branches-content {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding-left: 25%;
+    padding-right: 25%;
+}
+
+#branches-header {
+    padding-top: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+#branches-list {
+    width: 100%;
+    border: 2px solid black;
+    box-shadow: 4px 4px 0 0 rgba(0, 0, 0, 1);
+}
+
+#branches-list li {
+    border: none;
+    border-bottom: 2px solid black;
+}
+
+#branches-list li:last-child {
+    border-bottom: none;
+}
+
+#branches-list .fa-check:before {
+    margin-right: 5px;
 }

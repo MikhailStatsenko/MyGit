@@ -3,6 +3,7 @@ package com.vcs.mygit.git.service;
 import com.vcs.mygit.exception.NothingToCommitException;
 import com.vcs.mygit.git.dto.CommitInfo;
 import com.vcs.mygit.git.dto.RepositoryContext;
+import com.vcs.mygit.git.dto.response.StatusResponse;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
 
@@ -24,5 +25,7 @@ public interface CommandService {
     Set<String> addAll(RepositoryContext repoContext)
             throws IOException, GitAPIException;
 
-    List<CommitInfo> getCommitLog(RepositoryContext repoContext) throws IOException, GitAPIException;
+    List<CommitInfo> log(RepositoryContext repoContext, String branch) throws IOException, GitAPIException;
+
+    StatusResponse status(RepositoryContext repoContext) throws IOException, GitAPIException;
 }

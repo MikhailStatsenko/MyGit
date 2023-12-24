@@ -11,6 +11,7 @@ function showRepositoryContents(userId, repositoryName) {
 }
 
 const upTheHierarchyElement = document.getElementById('up-the-hierarchy');
+const backFromRepository = document.getElementById('back-from-repository');
 const deleteDirOrFile = document.getElementById('delete-dir-or-file');
 function fetchRepositoryContent() {
     const jwtToken = localStorage.getItem('jwtToken');
@@ -83,6 +84,7 @@ function fetchRepositoryContent() {
 }
 
 upTheHierarchyElement.addEventListener('click', function () {removeLastPathPart()})
+backFromRepository.addEventListener('click', function () {showElement('home-page-content');})
 
 function removeLastPathPart() {
     var lastSlashIndex = path.lastIndexOf('/');
@@ -104,6 +106,8 @@ function readFile() {
             const repositoryContent = document.getElementById('repository-content');
             repositoryContent.innerHTML = '';
             const row = document.createElement('tr');
+            row.classList.add("overflow-scroll")
+            
             const cell = document.createElement('td');
             const text = document.createElement('pre')
 

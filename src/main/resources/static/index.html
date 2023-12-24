@@ -91,19 +91,18 @@
           <tr>
             <th id="repository-content-table-head">
               <span>Содержимое репозитория</span>
-<!--              <i class="fas fa-code-commit"></i>-->
               <div id="repository-navigation">
                 <i class="fas fa-arrow-up repository-nav-button" id="up-the-hierarchy"></i>
                 <i class="fas fa-trash repository-nav-button" id="delete-dir-or-file"></i>
-                <i class="repository-nav-button" style="padding-top: 0">
+                <i class="repository-nav-button" style="padding-top: 0" id="commit-changes-btn">
                   <svg xmlns="http://www.w3.org/2000/svg" height="18" width="17" viewBox="0 0 640 512">
                     <path d="M320 336a80 80 0 1 0 0-160 80 80 0 1 0 0 160zm156.8-48C462 361 397.4 416 320 416s-142-55-156.8-128H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H163.2C178 151 242.6 96 320 96s142 55 156.8 128H608c17.7 0 32 14.3 32 32s-14.3 32-32 32H476.8z"/>
                   </svg>
                 </i>
                 <i class="fas fa-code-branch repository-nav-button" id="branches-btn"></i>
-                <i class="fas fa-book repository-nav-button" id="git-log-btn"></i>
-<!--                <i class="far fa-cloud-arrow-up repository-nav-button" id="upload-files-btn"></i>-->
+                <i class="fas fa-history repository-nav-button" id="git-log-btn"></i>
                 <i class="fas fa-download repository-nav-button" id="download-repository-archive"></i>
+                <i class="fas fa-home repository-nav-button" id="back-from-repository"></i>
               </div>
             </th>
           </tr>
@@ -127,6 +126,7 @@
     </div>
 
 
+
     <!-- Страница коммитов -->
     <div id="commit-info" class="hidden">
       <div id="commit-info-content">
@@ -134,7 +134,40 @@
           <h4>Информация о коммитах</h4>
           <i class="fas fa-arrow-left repository-nav-button" id="back-from-git-log"></i>
         </div>
+        <div id="select-branch-log" class="mb-3">
+          <select id="branch-selector" class="form-select form-select-sm"></select>
+        </div>
         <ul id="commit-list"></ul>
+      </div>
+    </div>
+
+
+
+    <!-- Страница для работы с ветками -->
+    <div id="branches-page-content" class="hidden">
+      <div id="branches-content">
+        <div id="branches-header">
+          <h4>Ветки репозитория</h4>
+          <i class="fas fa-arrow-left repository-nav-button" id="back-from-branches"></i>
+        </div>
+        <div id="add-new-branch" class="d-flex justify-content-center align-items-center mb-3">
+          <input type="text" class="form-control border-2 mr-2" id="new-branch-name" placeholder="Имя новой ветки" required>
+          <button type="button" class="btn btn-warning border-black border-2" onclick="addBranch()">Добавить</button>
+        </div>
+        <ul id="branches-list" class="list-group"></ul>
+      </div>
+    </div>
+
+
+    <!-- Страница для работы со статусом файлов и коммитом изменений -->
+    <div id="commit-page-content">
+      <h4 id="untracked-files-header"></h4>
+      <ul id="untracked-files-list" class="list-group"></ul>
+      <h4>Modified files</h4>
+      <ul id="modified-files-list" class="list-group"></ul>
+      <div id="commit-form">
+        <input type="text" id="commit-message" placeholder="Enter commit message">
+        <button onclick="commitChanges()">Commit</button>
       </div>
     </div>
 
@@ -161,10 +194,14 @@
   <script src="/static/js/header.js"></script>
   <!--Repository-->
   <script src="/static/js/repository.js"></script>
+  <!--Branches-->
+  <script src="/static/js/branches.js"></script>
   <!--Files-->
   <script src="/static/js/files.js"></script>
   <!--Git log-->
   <script src="/static/js/git-log.js"></script>
+  <!--Git commit & status-->
+  <script src="/static/js/commit.js"></script>
   <!--Index-->
   <script src="/static/js/index.js"></script>
   <!--Auth-->

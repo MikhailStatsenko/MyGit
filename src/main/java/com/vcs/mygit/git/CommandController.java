@@ -4,6 +4,7 @@ import com.vcs.mygit.annotation.RepositoryOwnerAccess;
 import com.vcs.mygit.git.dto.CommitInfo;
 import com.vcs.mygit.git.dto.RepositoryContext;
 import com.vcs.mygit.git.dto.response.CommitResponse;
+import com.vcs.mygit.git.dto.response.StatusResponse;
 import com.vcs.mygit.git.service.CommandService;
 import com.vcs.mygit.git.util.DateFormatter;
 import lombok.RequiredArgsConstructor;
@@ -85,14 +86,27 @@ public class CommandController {
 
     @RepositoryOwnerAccess
     @GetMapping("/log/{userId}/{repositoryName}")
-    public ResponseEntity<List<CommitInfo>> getCommitLog(
+    public ResponseEntity<List<CommitInfo>> getLog(
+            @PathVariable String userId,
+            @PathVariable String repositoryName,
+            @RequestParam(required = false, defaultValue = "master") String branch,
+            HttpServletRequest httpServletRequest
+    ) throws GitAPIException, IOException {
+        var repositoryContext = new RepositoryContext(userId, repositoryName);
+        List<CommitInfo> commitLog = commandService.log(repositoryContext, branch);
+        return ResponseEntity.ok(commitLog);
+    }
+
+    @RepositoryOwnerAccess
+    @GetMapping("/status/{userId}/{repositoryName}")
+    public ResponseEntity<StatusResponse> getRepositoryStatus(
             @PathVariable String userId,
             @PathVariable String repositoryName,
             HttpServletRequest httpServletRequest
     ) throws GitAPIException, IOException {
         var repositoryContext = new RepositoryContext(userId, repositoryName);
-        List<CommitInfo> commitLog = commandService.getCommitLog(repositoryContext);
-        return ResponseEntity.ok(commitLog);
+        StatusResponse statusResponse = commandService.status(repositoryContext);
+        return ResponseEntity.ok(statusResponse);
     }
 }
 
