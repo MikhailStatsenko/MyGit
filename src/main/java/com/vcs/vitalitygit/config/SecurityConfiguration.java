@@ -1,6 +1,6 @@
 package com.vcs.vitalitygit.config;
 
-import com.vcs.vitalitygit.user.UserService;
+import com.vcs.vitalitygit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,7 +27,9 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/api/auth/**", "/static/**","/", "/api/user/**").permitAll()
+                .antMatchers("/api/auth/**", "/api/user/**",
+                        "/swagger-resources/**", "/v2/api-docs", "/swagger-ui/**")
+                .permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()

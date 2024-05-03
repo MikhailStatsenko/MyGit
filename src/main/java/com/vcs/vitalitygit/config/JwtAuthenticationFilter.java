@@ -1,7 +1,7 @@
 package com.vcs.vitalitygit.config;
 
-import com.vcs.vitalitygit.security.JwtService;
-import com.vcs.vitalitygit.user.UserService;
+import com.vcs.vitalitygit.service.JwtService;
+import com.vcs.vitalitygit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;

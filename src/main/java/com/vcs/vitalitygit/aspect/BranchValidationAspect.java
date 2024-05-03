@@ -1,41 +1,30 @@
 package com.vcs.vitalitygit.aspect;
 
-import com.vcs.vitalitygit.git.dto.RepositoryContext;
-import com.vcs.vitalitygit.git.service.BranchService;
+import com.vcs.vitalitygit.domain.dto.RepositoryDetails;
+import com.vcs.vitalitygit.service.BranchService;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.regex.Pattern;
 
-@Aspect
+//@Aspect
 @Component
 @RequiredArgsConstructor
 public class BranchValidationAspect {
     private final BranchService branchService;
 
-    @Before(value = "execution(* com.vcs.vitalitygit.git.service.impl.*.*(..)) && args(branchName, ..)", argNames = "branchName")
-    public void validateBranchName(String branchName) {
-        String branchPattern = "^[\\w.-]+$";
-        if (!Pattern.matches(branchPattern, branchName)) {
-            throw new IllegalArgumentException("Invalid branch name. Branch names can only contain " +
-                            "letters, numbers, underscore (_) or dash (-)");
-        }
-    }
-
-    @Before(value = "within(com.vcs.vitalitygit.git.service.BranchService+) && " +
+    @Before(value = "within(com.vcs.vitalitygit.service.BranchService+) && " +
             "execution(* com.vcs.vitalitygit.git.service.impl.*.*(..)) && args(repositoryContext, branchName, ..) " +
             "&& !execution(* com.vcs.vitalitygit.git.service.impl.*.createBranch(..))",
             argNames = "repositoryContext, branchName")
     public void checkIfBranchExists(
-            RepositoryContext repositoryContext,
+            RepositoryDetails repositoryDetails,
             String branchName
     ) throws GitAPIException, IOException {
-        List<String> branches = branchService.listBranches(repositoryContext);
+        List<String> branches = branchService.listBranches(repositoryDetails);
         boolean branchExists = branches.contains(branchName);
         if (!branchExists)
             throw new IllegalArgumentException("Branch " + branchName + " not found");

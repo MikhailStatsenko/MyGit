@@ -11,6 +11,7 @@ spring:
       ddl-auto: validate
   liquibase:
     enabled: false
+
 token:
   signing:
     key: ${SIGNING_TOKEN}
