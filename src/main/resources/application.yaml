@@ -1,22 +1,16 @@
 spring:
   application:
-    name: my-git
+    name: vitality-git
   datasource:
-    url: jdbc:postgresql://localhost:5432/mygit
-    username: postgres
-    password: qwerty
+    url: jdbc:postgresql://localhost:5432/vitality-git
+    username: ${POSTGRESQL_USERNAME}
+    password: ${POSTGRESQL_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update
-    #      ddl-auto: create-drop
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-    database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+      ddl-auto: validate
+  liquibase:
+    enabled: false
 token:
   signing:
-    key: 6cf5d4dc70dff0438476871e9e65afd351663dd721d6dc8f1febd44260a81b31
-#server:
-#  port: 80
+    key: ${SIGNING_TOKEN}

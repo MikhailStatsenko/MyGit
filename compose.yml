@@ -1,0 +1,35 @@
+services:
+  postgresql:
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: vitality-git
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgresql:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  liquibase-migrations:
+    image: liquibase/liquibase:4.25
+    depends_on:
+      - postgresql
+    command:
+      - --changelog-file=changelog-master.yml
+      - --driver=org.postgresql.Driver
+      - --url=jdbc:postgresql://postgresql:5432/vitality-git
+      - --username=postgres
+      - --password=postgres
+      - update
+    volumes:
+      - ./migrations:/liquibase/changelog
+    networks:
+      - backend
+
+volumes:
+  postgresql: { }
+
+networks:
+  backend: { }

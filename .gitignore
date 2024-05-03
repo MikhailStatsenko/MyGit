@@ -1,9 +1,8 @@
-HELP.md
-.gradle
-build/
-!gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
+### Test ###
+/test_repo/
+
+### Secret ###
+/src/main/resources/secret.env
 
 ### STS ###
 .apt_generated
@@ -35,5 +34,3 @@ out/
 
 ### VS Code ###
 .vscode/
-
-/test_repo/
