@@ -5,7 +5,7 @@ import com.vcs.vitalitygit.domain.dto.branch.request.BranchRequest;
 import com.vcs.vitalitygit.domain.dto.branch.request.MergeBranchRequests;
 import com.vcs.vitalitygit.domain.dto.branch.request.RenameBranchRequest;
 import com.vcs.vitalitygit.domain.dto.branch.response.*;
-import com.vcs.vitalitygit.domain.dto.comand.CommitResponse;
+import com.vcs.vitalitygit.domain.dto.comand.response.CommitResponse;
 import com.vcs.vitalitygit.service.BranchService;
 import com.vcs.vitalitygit.util.DateFormatter;
 import lombok.RequiredArgsConstructor;

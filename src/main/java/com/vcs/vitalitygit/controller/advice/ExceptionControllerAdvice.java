@@ -1,6 +1,7 @@
 package com.vcs.vitalitygit.controller.advice;
 
 import com.vcs.vitalitygit.domain.dto.api.ApiErrorResponse;
+import com.vcs.vitalitygit.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -26,14 +27,22 @@ public class ExceptionControllerAdvice {
     }
 
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    @ExceptionHandler(UsernameNotFoundException.class)
-    public ApiErrorResponse handleUsernameNotFoundException(UsernameNotFoundException ex) {
+    @ExceptionHandler({UsernameNotFoundException.class, ForbiddenAccessException.class})
+    public ApiErrorResponse handleForbidden(Exception ex) {
         return new ApiErrorResponse(HttpStatus.FORBIDDEN, ex);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ApiErrorResponse handleIllegalArgumentException(IllegalArgumentException ex) {
+    @ExceptionHandler({
+            IllegalArgumentException.class, RepositoryNotFoundException.class,
+            MergeConflictException.class, NothingToCommitException.class})
+    public ApiErrorResponse handleBadRequest(Exception ex) {
         return new ApiErrorResponse(HttpStatus.BAD_REQUEST, ex);
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(MergeFailedException.class)
+    public ApiErrorResponse handleConflict(Exception ex) {
+        return new ApiErrorResponse(HttpStatus.CONFLICT, ex);
     }
 }

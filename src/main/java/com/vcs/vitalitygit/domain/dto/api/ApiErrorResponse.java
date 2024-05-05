@@ -2,6 +2,7 @@ package com.vcs.vitalitygit.domain.dto.api;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
@@ -27,7 +28,7 @@ public class ApiErrorResponse {
     public ApiErrorResponse(HttpStatus status, Exception exception) {
         this();
         this.status = status;
-        this.message = exception.getMessage();
+        this.message = StringUtils.capitalize(exception.getMessage());
         this.debugMessage = exception.toString();
     }
 

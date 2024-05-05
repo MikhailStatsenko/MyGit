@@ -1,3 +1,9 @@
 package com.vcs.vitalitygit.domain.dto.auth;
 
-public record JwtAuthenticationResponse (String token) {}
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public record JwtAuthenticationResponse (
+        @JsonProperty("token")
+        String token
+) {
+}

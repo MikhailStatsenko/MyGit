@@ -1,12 +1,12 @@
 package com.vcs.vitalitygit.controller;
 
-import com.vcs.vitalitygit.domain.dto.user.AllUsersNamesResponse;
+import com.vcs.vitalitygit.domain.dto.user.UserDto;
+import com.vcs.vitalitygit.domain.dto.user.UsersNamesResponse;
 import com.vcs.vitalitygit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -15,9 +15,23 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+
     @GetMapping("/all")
-    public ResponseEntity<AllUsersNamesResponse> allUserNames() {
+    public ResponseEntity<UsersNamesResponse> allUserNames() {
         List<String> userNames = userService.getAllUserNames();
-        return ResponseEntity.ok(new AllUsersNamesResponse(userNames));
+        return ResponseEntity.ok(new UsersNamesResponse(userNames));
+    }
+
+    @GetMapping("/{username}")
+    public ResponseEntity<UserDto> getUser(@PathVariable String username) {
+        var user = userService.getUserOptionalByUsername(username).map(UserDto::new)
+                .orElseThrow(() -> new UsernameNotFoundException(username));
+        return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/pattern")
+    public ResponseEntity<UsersNamesResponse> getUsersNamesByPattern(@RequestParam String pattern) {
+        List<String> userNames = userService.getAllUserNamesByPattern(pattern);
+        return ResponseEntity.ok(new UsersNamesResponse(userNames));
     }
 }

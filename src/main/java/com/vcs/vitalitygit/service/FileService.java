@@ -2,6 +2,7 @@ package com.vcs.vitalitygit.service;
 
 import com.vcs.vitalitygit.domain.dto.RepositoryDetails;
 import com.vcs.vitalitygit.domain.dto.file.UploadFilesResponse;
+import com.vcs.vitalitygit.exception.ForbiddenAccessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,6 +19,8 @@ import java.util.zip.ZipOutputStream;
 @Service
 @RequiredArgsConstructor
 public class FileService {
+    private final UserService userService;
+
     public Object getFileOrDirectoryContents(RepositoryDetails repoContext, String path) throws IOException {
         Path targetPath = repoContext.getRepositoryPath();
         if (path != null && !path.isBlank()) {
@@ -90,6 +93,10 @@ public class FileService {
             String path,
             MultipartFile[] files
     ) throws IOException {
+        if (!userService.isCurrentUserOwnsRepository(repoContext)) {
+            throw new ForbiddenAccessException("Only repository owner can upload files");
+        }
+
         Path repositoryPath = repoContext.getRepositoryPath();
 
         if (files == null || files.length == 0)
@@ -127,6 +134,10 @@ public class FileService {
     }
 
     public void createNewDirectory(RepositoryDetails repoContext, String path, String dirName) throws IOException {
+        if (!userService.isCurrentUserOwnsRepository(repoContext)) {
+            throw new ForbiddenAccessException("Only repository owner can create new directories");
+        }
+
         Path repositoryPath = repoContext.getRepositoryPath();
 
         Path newDirectoryPath = repositoryPath.resolve(path).resolve(dirName);
@@ -165,6 +176,10 @@ public class FileService {
     }
 
     public List<String> deleteFile(RepositoryDetails repoContext, String path) throws IOException {
+        if (!userService.isCurrentUserOwnsRepository(repoContext)) {
+            throw new ForbiddenAccessException("Only repository owner can delete files");
+        }
+
         Path pathInRepository = repoContext.getRepositoryPath().resolve(path);
 
         if (!isPathAllowedToDelete(pathInRepository)) {
@@ -189,7 +204,6 @@ public class FileService {
     }
 
     private List<String> deleteDirectory(Path directoryPath) throws IOException {
-
         List<String> deletedFiles = new ArrayList<>();
         Files.walkFileTree(directoryPath, new SimpleFileVisitor<>() {
             @Override

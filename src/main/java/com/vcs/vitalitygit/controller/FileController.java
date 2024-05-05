@@ -1,6 +1,5 @@
 package com.vcs.vitalitygit.controller;
 
-import com.vcs.vitalitygit.annotation.RepositoryOwnerAccess;
 import com.vcs.vitalitygit.domain.dto.RepositoryDetails;
 import com.vcs.vitalitygit.domain.dto.file.DeleteFileResponse;
 import com.vcs.vitalitygit.domain.dto.file.UploadFilesResponse;
@@ -44,7 +43,6 @@ public class FileController {
         return ResponseEntity.ok(fileService.getFileOrDirectoryContents(repositoryContext, path));
     }
 
-    @RepositoryOwnerAccess
     @PostMapping("/upload/{userId}/{repositoryName}/**")
     public ResponseEntity<UploadFilesResponse> uploadFilesToWorkingDirectory(
             @PathVariable String userId,
@@ -58,7 +56,6 @@ public class FileController {
         return ResponseEntity.ok(response);
     }
 
-    @RepositoryOwnerAccess
     @PostMapping("/add-directory/{userId}/{repositoryName}/**")
     public ResponseEntity<String> createNewDirectory(
             @PathVariable String userId,
@@ -84,7 +81,6 @@ public class FileController {
         response.setStatus(HttpServletResponse.SC_OK);
     }
 
-    @RepositoryOwnerAccess
     @DeleteMapping("/delete/{userId}/{repositoryName}/**")
     public ResponseEntity<DeleteFileResponse> deleteFile(
             @PathVariable String userId,

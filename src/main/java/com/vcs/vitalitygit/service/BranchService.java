@@ -1,6 +1,7 @@
 package com.vcs.vitalitygit.service;
 
 import com.vcs.vitalitygit.domain.dto.RepositoryDetails;
+import com.vcs.vitalitygit.exception.ForbiddenAccessException;
 import com.vcs.vitalitygit.exception.MergeConflictException;
 import com.vcs.vitalitygit.exception.MergeFailedException;
 import com.vcs.vitalitygit.util.GitRepositoryOpener;
@@ -16,22 +17,15 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
 public class BranchService implements GitRepositoryOpener {
+    private final UserService userService;
+
     private static String getBranchNameFromRef(Ref ref) {
         String branchName = ref.getName();
         return branchName.substring(branchName.lastIndexOf('/') + 1);
-    }
-
-    private static void validateBranchName(String branchName) {
-        String branchPattern = "^[\\w.-]+$";
-        if (!Pattern.matches(branchPattern, branchName)) {
-            throw new IllegalArgumentException("Invalid branch name. Branch names can only contain " +
-                    "letters, numbers, underscore (_) or dash (-)");
-        }
     }
 
     public String getCurrentBranch(RepositoryDetails repoContext) throws IOException {
@@ -47,9 +41,14 @@ public class BranchService implements GitRepositoryOpener {
             RepositoryDetails repoContext,
             String branchName
     ) throws IOException, GitAPIException {
+        if (!userService.isCurrentUserOwnsRepository(repoContext)) {
+            throw new ForbiddenAccessException("Only repository owner can create branches");
+        }
+
         boolean branchAlreadyExists = listBranches(repoContext).contains(branchName);
-        if (branchAlreadyExists)
+        if (branchAlreadyExists) {
             throw new IllegalArgumentException("Branch already exists");
+        }
 
         Path repositoryPath = repoContext.getRepositoryPath();
         try (Git git = openGitRepository(repositoryPath)) {
@@ -62,6 +61,10 @@ public class BranchService implements GitRepositoryOpener {
             RepositoryDetails repoContext,
             String branchName
     ) throws IOException, GitAPIException {
+        if (!userService.isCurrentUserOwnsRepository(repoContext)) {
+            throw new ForbiddenAccessException("Only repository owner can switch branches");
+        }
+
         Path repositoryPath = repoContext.getRepositoryPath();
         try (Git git = openGitRepository(repositoryPath)) {
             git.checkout().setForced(true).setName(branchName).call();
@@ -83,6 +86,10 @@ public class BranchService implements GitRepositoryOpener {
             RepositoryDetails repoContext,
             String branchName
     ) throws IOException, GitAPIException {
+        if (!userService.isCurrentUserOwnsRepository(repoContext)) {
+            throw new ForbiddenAccessException("Only repository owner can delete branches");
+        }
+
         Path repositoryPath = repoContext.getRepositoryPath();
 
         if (getCurrentBranch(repoContext).equals(branchName)) {
@@ -101,7 +108,9 @@ public class BranchService implements GitRepositoryOpener {
             String branchName,
             String newBranchName
     ) throws IOException, GitAPIException {
-        validateBranchName(newBranchName);
+        if (!userService.isCurrentUserOwnsRepository(repoContext)) {
+            throw new ForbiddenAccessException("Only repository owner can rename branches");
+        }
 
         Path repositoryPath = repoContext.getRepositoryPath();
         try (Git git = openGitRepository(repositoryPath)) {
@@ -118,6 +127,10 @@ public class BranchService implements GitRepositoryOpener {
             String branchToMerge,
             String branchToMergeInto
     ) throws IOException, GitAPIException {
+        if (!userService.isCurrentUserOwnsRepository(repoContext)) {
+            throw new ForbiddenAccessException("Only repository owner can merge branches");
+        }
+
         Path repositoryPath = repoContext.getRepositoryPath();
         try (Git git = openGitRepository(repositoryPath)) {
             switchBranch(repoContext, branchToMergeInto);

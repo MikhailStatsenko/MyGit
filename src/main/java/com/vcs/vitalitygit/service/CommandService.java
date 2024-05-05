@@ -1,11 +1,13 @@
 package com.vcs.vitalitygit.service;
 
 import com.vcs.vitalitygit.domain.dto.RepositoryDetails;
-import com.vcs.vitalitygit.domain.dto.comand.LogInfoElementResponse;
-import com.vcs.vitalitygit.domain.dto.comand.StatusResponse;
+import com.vcs.vitalitygit.domain.dto.comand.response.LogInfoElementResponse;
+import com.vcs.vitalitygit.domain.dto.comand.response.StatusResponse;
+import com.vcs.vitalitygit.exception.ForbiddenAccessException;
 import com.vcs.vitalitygit.exception.NothingToCommitException;
 import com.vcs.vitalitygit.util.DateFormatter;
 import com.vcs.vitalitygit.util.GitRepositoryOpener;
+import lombok.RequiredArgsConstructor;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -18,7 +20,10 @@ import java.nio.file.Path;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class CommandService implements GitRepositoryOpener {
+    private final UserService userService;
+
     private void createInitialCommit(RepositoryDetails repoContext) throws IOException, GitAPIException {
         Path repositoryPath = repoContext.getRepositoryPath();
         try (Git git = openGitRepository(repositoryPath)) {
@@ -30,6 +35,10 @@ public class CommandService implements GitRepositoryOpener {
     }
 
     public void init(RepositoryDetails repoContext) throws GitAPIException, IOException {
+        if (!userService.isCurrentUserOwnsRepository(repoContext)) {
+            throw new ForbiddenAccessException("You can't create repositories for other users");
+        }
+
         Path repositoryPath = repoContext.getRepositoryPath();
         if (Files.isDirectory(repositoryPath)) {
             throw new IllegalArgumentException("Repository already exists");
@@ -46,6 +55,10 @@ public class CommandService implements GitRepositoryOpener {
             RepositoryDetails repoContext,
             String message
     ) throws IOException, GitAPIException {
+        if (!userService.isCurrentUserOwnsRepository(repoContext)) {
+            throw new ForbiddenAccessException("Only repository owner can make commits");
+        }
+
         Path repositoryPath = repoContext.getRepositoryPath();
 
         try (Git git = openGitRepository(repositoryPath)) {
@@ -63,6 +76,10 @@ public class CommandService implements GitRepositoryOpener {
             RepositoryDetails repoContext,
             String filePath
     ) throws IOException, GitAPIException {
+        if (!userService.isCurrentUserOwnsRepository(repoContext)) {
+            throw new ForbiddenAccessException("Only repository owner can add files to index");
+        }
+
         if (filePath == null || filePath.isBlank())
             throw new IllegalArgumentException("File path parameter must be present");
 
@@ -84,6 +101,10 @@ public class CommandService implements GitRepositoryOpener {
     }
 
     public Set<String> remove(RepositoryDetails repoContext, String filePath) throws IOException, GitAPIException {
+        if (!userService.isCurrentUserOwnsRepository(repoContext)) {
+            throw new ForbiddenAccessException("Only repository owner can remove files from index");
+        }
+
         if (filePath == null || filePath.isBlank()) {
             throw new IllegalArgumentException("File path parameter must be present");
         }
