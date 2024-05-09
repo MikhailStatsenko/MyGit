@@ -6,7 +6,7 @@ import com.vcs.vitalitygit.domain.dto.comand.response.StatusResponse;
 import com.vcs.vitalitygit.exception.ForbiddenAccessException;
 import com.vcs.vitalitygit.exception.NothingToCommitException;
 import com.vcs.vitalitygit.util.DateFormatter;
-import com.vcs.vitalitygit.util.GitRepositoryOpener;
+import com.vcs.vitalitygit.util.GitRepositoryUser;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
@@ -21,7 +21,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class CommandService implements GitRepositoryOpener {
+public class CommandService implements GitRepositoryUser {
     private final UserService userService;
 
     private void createInitialCommit(RepositoryDetails repoContext) throws IOException, GitAPIException {

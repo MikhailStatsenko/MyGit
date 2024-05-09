@@ -6,6 +6,6 @@ import java.util.List;
 
 public record UsersNamesResponse(
         @JsonProperty("users")
-        List<String> users
+        List<UserDto> users
 ) {
 }

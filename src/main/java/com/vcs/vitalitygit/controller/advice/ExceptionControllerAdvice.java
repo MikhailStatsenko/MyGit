@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +36,7 @@ public class ExceptionControllerAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({
             IllegalArgumentException.class, RepositoryNotFoundException.class,
-            MergeConflictException.class, NothingToCommitException.class})
+            MergeConflictException.class, NothingToCommitException.class, SQLException.class})
     public ApiErrorResponse handleBadRequest(Exception ex) {
         return new ApiErrorResponse(HttpStatus.BAD_REQUEST, ex);
     }

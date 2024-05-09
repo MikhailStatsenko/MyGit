@@ -11,13 +11,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
     @PostMapping("/register")
-    public ResponseEntity<JwtAuthenticationResponse> register(@RequestBody RegistrationRequest request) {
+    public ResponseEntity<JwtAuthenticationResponse> register(@RequestBody RegistrationRequest request)
+            throws IOException {
         return ResponseEntity.ok(authenticationService.register(request));
     }
 

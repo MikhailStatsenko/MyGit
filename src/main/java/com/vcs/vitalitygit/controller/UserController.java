@@ -5,7 +5,6 @@ import com.vcs.vitalitygit.domain.dto.user.UsersNamesResponse;
 import com.vcs.vitalitygit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,20 +17,25 @@ public class UserController {
 
     @GetMapping("/all")
     public ResponseEntity<UsersNamesResponse> allUserNames() {
-        List<String> userNames = userService.getAllUserNames();
+        List<UserDto> userNames = userService.getAllUsers().stream().map(UserDto::new).toList();
         return ResponseEntity.ok(new UsersNamesResponse(userNames));
     }
 
     @GetMapping("/{username}")
     public ResponseEntity<UserDto> getUser(@PathVariable String username) {
-        var user = userService.getUserOptionalByUsername(username).map(UserDto::new)
-                .orElseThrow(() -> new UsernameNotFoundException(username));
-        return ResponseEntity.ok(user);
+        var user = userService.getUserByUsername(username);
+        return ResponseEntity.ok(new UserDto(user));
+    }
+
+    @GetMapping("/current")
+    public ResponseEntity<UserDto> getCurrentUser() {
+        var user = userService.getCurrentUser();
+        return ResponseEntity.ok(new UserDto(user));
     }
 
     @GetMapping("/pattern")
     public ResponseEntity<UsersNamesResponse> getUsersNamesByPattern(@RequestParam String pattern) {
-        List<String> userNames = userService.getAllUserNamesByPattern(pattern);
+        List<UserDto> userNames = userService.getAllUsersByPattern(pattern).stream().map(UserDto::new).toList();
         return ResponseEntity.ok(new UsersNamesResponse(userNames));
     }
 }

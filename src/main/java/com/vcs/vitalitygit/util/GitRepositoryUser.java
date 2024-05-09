@@ -7,14 +7,17 @@ import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import java.io.IOException;
 import java.nio.file.Path;
 
-public interface GitRepositoryOpener {
+public interface GitRepositoryUser {
     default Git openGitRepository(Path repositoryPath) throws IOException {
+        return new Git(getClosedRepository(repositoryPath));
+    }
+
+    default Repository getClosedRepository(Path repositoryPath) throws IOException {
         FileRepositoryBuilder builder = new FileRepositoryBuilder();
-        Repository repository = builder.setGitDir(repositoryPath.resolve(".git").toFile())
+        return builder.setGitDir(repositoryPath.resolve(".git").toFile())
                 .readEnvironment()
                 .findGitDir()
                 .build();
-        return new Git(repository);
     }
 }
 

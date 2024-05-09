@@ -4,7 +4,7 @@ import com.vcs.vitalitygit.domain.dto.RepositoryDetails;
 import com.vcs.vitalitygit.exception.ForbiddenAccessException;
 import com.vcs.vitalitygit.exception.MergeConflictException;
 import com.vcs.vitalitygit.exception.MergeFailedException;
-import com.vcs.vitalitygit.util.GitRepositoryOpener;
+import com.vcs.vitalitygit.util.GitRepositoryUser;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.MergeResult;
@@ -20,7 +20,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class BranchService implements GitRepositoryOpener {
+public class BranchService implements GitRepositoryUser {
     private final UserService userService;
 
     private static String getBranchNameFromRef(Ref ref) {

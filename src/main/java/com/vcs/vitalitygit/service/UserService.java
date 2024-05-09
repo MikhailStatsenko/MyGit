@@ -10,7 +10,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,8 +21,8 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
-    public List<String> getAllUserNames() {
-        return userRepository.findAll().stream().map(User::getUsername).toList();
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 
     public String getCurrentUsername() {
@@ -44,11 +43,7 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
-    public Optional<User> getUserOptionalByUsername(String username) {
-        return userRepository.findUserByUsername(username);
-    }
-
-    public List<String> getAllUserNamesByPattern(String pattern) {
-        return userRepository.findAllByUsernameContainingIgnoreCase(pattern).stream().map(User::getUsername).toList();
+    public List<User> getAllUsersByPattern(String pattern) {
+        return userRepository.findAllByUsernameContainingIgnoreCase(pattern);
     }
 }

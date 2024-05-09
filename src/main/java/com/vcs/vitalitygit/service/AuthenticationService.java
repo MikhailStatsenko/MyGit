@@ -1,5 +1,6 @@
 package com.vcs.vitalitygit.service;
 
+import com.vcs.vitalitygit.domain.dto.RepositoryDetails;
 import com.vcs.vitalitygit.domain.dto.auth.JwtAuthenticationResponse;
 import com.vcs.vitalitygit.domain.dto.auth.LoginRequest;
 import com.vcs.vitalitygit.domain.dto.auth.RegistrationRequest;
@@ -12,6 +13,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
@@ -20,7 +25,7 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    public JwtAuthenticationResponse register(RegistrationRequest request) {
+    public JwtAuthenticationResponse register(RegistrationRequest request) throws IOException {
         if (userRepository.findUserByUsername(request.username()).isPresent()) {
             throw new IllegalArgumentException("User already exists");
         }
@@ -32,6 +37,12 @@ public class AuthenticationService {
                 .build();
         userRepository.save(user);
         var jwt = jwtService.generateToken(user);
+
+        Path userReposPath = Path.of(RepositoryDetails.rootPath()).resolve(request.username());
+        if (Files.notExists(userReposPath)) {
+            Files.createDirectories(userReposPath);
+        }
+
         return new JwtAuthenticationResponse(jwt);
     }
 
