@@ -1,4 +1,18 @@
 services:
+#  app:
+#    image: mikhailstatsenko/vitality-git-backend
+#    ports:
+#      - "8080:8080"
+#    environment:
+#      - DATABASE_URL=jdbc:postgresql://postgresql:5432/vitality-git
+#      - POSTGRESQL_USERNAME=postgres
+#      - POSTGRESQL_PASSWORD=postgres
+#      - SIGNING_TOKEN=6cf5d4dc70dff0438476871e9e65afd351663dd721d6dc8f1febd44260a81b31
+#    depends_on:
+#      - postgresql
+#    networks:
+#      - backend
+
   postgresql:
     image: postgres:16
     ports:

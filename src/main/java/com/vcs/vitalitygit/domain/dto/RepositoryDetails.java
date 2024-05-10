@@ -30,7 +30,6 @@ public class RepositoryDetails {
         return Path.of(rootPath + "/" + username + "/" +
                 repositoryName);
     }
-
 }
 
 
