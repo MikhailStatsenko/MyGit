@@ -11,7 +11,7 @@ services:
     depends_on:
       - postgresql
     volumes:
-      - ./repositories:/var/lib/app/repositories
+      - app:/var/lib/app
     networks:
       - backend
 
@@ -45,8 +45,8 @@ services:
       - backend
 
 volumes:
-  app: { }
   postgresql: { }
+  app: { }
 
 networks:
   backend: { }
