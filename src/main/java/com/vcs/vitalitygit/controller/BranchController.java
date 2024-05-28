@@ -47,21 +47,25 @@ public class BranchController {
         return ResponseEntity.ok(new SwitchBranchResponse(currentBranch));
     }
 
-    @GetMapping("/list")
-    public ResponseEntity<ListBranchesResponse> listBranches(@Valid @RequestBody RepositoryDetails repoDetails
+    @GetMapping("/list/{username}/{repo}")
+    public ResponseEntity<ListBranchesResponse> listBranches(@PathVariable String username,  @PathVariable String repo
     ) throws GitAPIException, IOException {
+        var repoDetails = new RepositoryDetails(username, repo);
         List<String> branches = branchService.listBranches(repoDetails);
         String currentBranch = branchService.getCurrentBranch(repoDetails);
 
         return ResponseEntity.ok(new ListBranchesResponse(currentBranch, branches));
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<DeleteBranchResponse> deleteBranch(@Valid @RequestBody BranchRequest request
+    @DeleteMapping("/delete/{username}/{repo}/{branch}")
+    public ResponseEntity<DeleteBranchResponse> deleteBranch(
+            @PathVariable String repo,
+            @PathVariable String username,
+            @PathVariable String branch
     ) throws GitAPIException, IOException {
-        var repoDetails = new RepositoryDetails(request.getUsername(), request.getRepositoryName());
+        var repoDetails = new RepositoryDetails(username, repo);
 
-        String deletedBranch = branchService.deleteBranch(repoDetails, request.getBranch());
+        String deletedBranch = branchService.deleteBranch(repoDetails, branch);
 
         return ResponseEntity.ok(new DeleteBranchResponse(deletedBranch));
     }
